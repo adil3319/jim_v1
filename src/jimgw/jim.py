@@ -104,7 +104,7 @@ class Jim(object):
     def sample(self, key: PRNGKeyArray, initial_position: Array = jnp.array([])):
         if initial_position.size == 0:
             initial_position = (
-                jnp.zeros((self.sampler.n_chains, self.prior.n_dim)) + jnp.nan
+                jnp.zeros((self.sampler.n_chains, self.prior.n_dim)) + jnp.inf
             )
 
             while not jax.tree.reduce(
