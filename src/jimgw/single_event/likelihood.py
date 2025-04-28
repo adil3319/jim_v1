@@ -620,7 +620,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         )
 
         best_fit = optimized_positions[jnp.argmin(summary["final_log_prob"])]
-        print(" best fit values are :",best_fit)
+        print(" best fit values are :",optimized_positions, summary)
         named_params = dict(zip(parameter_names, best_fit))
         for transform in reversed(sample_transforms):
             named_params = transform.backward(named_params)
