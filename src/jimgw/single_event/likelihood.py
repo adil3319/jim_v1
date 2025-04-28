@@ -421,6 +421,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
             align_time_center,
             **self.kwargs,
         )
+        print("LOG LIKELIHOOD:",log_likelihood)
         return log_likelihood
 
     def evaluate_original(
