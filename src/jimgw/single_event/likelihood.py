@@ -581,43 +581,59 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
         print("Starting the optimizer")
 
-        optimizer = optimization_Adam(
-            n_steps=n_steps, learning_rate=0.001, noise_level=1
-        )
+        # optimizer = optimization_Adam(
+        #     n_steps=n_steps, learning_rate=0.001, noise_level=1
+        # )
 
-        key = jax.random.PRNGKey(0)
-        initial_position = jnp.zeros((popsize, prior.n_dim)) + jnp.nan
-        while not jax.tree.reduce(
-            jnp.logical_and, jax.tree.map(lambda x: jnp.isfinite(x), initial_position)
-        ).all():
-            non_finite_index = jnp.where(
-                jnp.any(
-                    ~jax.tree.reduce(
-                        jnp.logical_and,
-                        jax.tree.map(lambda x: jnp.isfinite(x), initial_position),
-                    ),
-                    axis=1,
-                )
-            )[0]
+        # key = jax.random.PRNGKey(0)
+        # initial_position = jnp.zeros((popsize, prior.n_dim)) + jnp.nan
+        # while not jax.tree.reduce(
+        #     jnp.logical_and, jax.tree.map(lambda x: jnp.isfinite(x), initial_position)
+        # ).all():
+        #     non_finite_index = jnp.where(
+        #         jnp.any(
+        #             ~jax.tree.reduce(
+        #                 jnp.logical_and,
+        #                 jax.tree.map(lambda x: jnp.isfinite(x), initial_position),
+        #             ),
+        #             axis=1,
+        #         )
+        #     )[0]
 
-            key, subkey = jax.random.split(key)
-            guess = prior.sample(subkey, popsize)
-            for transform in sample_transforms:
-                guess = jax.vmap(transform.forward)(guess)
-            guess = jnp.array(
-                jax.tree.leaves({key: guess[key] for key in parameter_names})
-            ).T
-            finite_guess = jnp.where(
-                jnp.all(jax.tree.map(lambda x: jnp.isfinite(x), guess), axis=1)
-            )[0]
-            common_length = min(len(finite_guess), len(non_finite_index))
-            initial_position = initial_position.at[
-                non_finite_index[:common_length]
-            ].set(guess[:common_length])
+        #     key, subkey = jax.random.split(key)
+        #     guess = prior.sample(subkey, popsize)
+        #     for transform in sample_transforms:
+        #         guess = jax.vmap(transform.forward)(guess)
+        #     guess = jnp.array(
+        #         jax.tree.leaves({key: guess[key] for key in parameter_names})
+        #     ).T
+        #     finite_guess = jnp.where(
+        #         jnp.all(jax.tree.map(lambda x: jnp.isfinite(x), guess), axis=1)
+        #     )[0]
+        #     common_length = min(len(finite_guess), len(non_finite_index))
+        #     initial_position = initial_position.at[
+        #         non_finite_index[:common_length]
+        #     ].set(guess[:common_length])
         
-        rng_key, optimized_positions, summary = optimizer.optimize(
-            jax.random.PRNGKey(12094), y, initial_position
-        )
+        # rng_key, optimized_positions, summary = optimizer.optimize(
+        #     jax.random.PRNGKey(12094), y, initial_position
+        # )
+        master_key = jax.random.PRNGKey(42)
+        master_key, sample_key, opt_key = jax.random.split(master_key, 3)
+
+        initial_position = jnp.zeros((popsize, prior.n_dim)) + jnp.nan
+        while not jax.tree.reduce(jnp.logical_and, jax.tree.map(lambda x: jnp.isfinite(x), initial_position)).all():
+             non_finite_index = jnp.where(jnp.any(~jax.tree.reduce(jnp.logical_and,jax.tree.map(lambda x: jnp.isfinite(x), initial_position),),axis=1,))[0]
+             sample_key, subkey = jax.random.split(sample_key)
+             guess = prior.sample(subkey, popsize)
+             for transform in sample_transforms:
+                 guess = jax.vmap(transform.forward)(guess)
+                 guess = jnp.array(jax.tree.leaves({key: guess[key] for key in parameter_names})).T
+                 finite_guess = jnp.where(jnp.all(jax.tree.map(lambda x: jnp.isfinite(x), guess), axis=1))[0]
+                 common_length = min(len(finite_guess), len(non_finite_index))
+                 initial_position = initial_position.at[non_finite_index[:common_length]].set(guess[:common_length])
+# Use the pre-split opt_key to ensure determinism
+        rng_key, optimized_positions, summary = optimizer.optimize(opt_key, y, initial_position)
 
         best_fit = optimized_positions[jnp.argmin(summary["final_log_prob"])]
         print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
