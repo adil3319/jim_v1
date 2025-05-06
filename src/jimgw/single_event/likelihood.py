@@ -580,7 +580,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
                 named_params = transform.forward(named_params)
             return -self.evaluate_original(named_params, {})
 
-       
+        print("Starting Adam optimizer :")
         optimizer = optimization_Adam(
             n_steps=n_steps, learning_rate=0.001, noise_level=1
         )
