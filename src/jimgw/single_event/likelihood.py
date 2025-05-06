@@ -8,7 +8,7 @@ from jax.scipy.special import logsumexp
 from jaxtyping import Array, Float
 from typing import Optional
 from scipy.interpolate import interp1d
-from jaxopt import ScipyMinimize
+from scipy.optimize import minimize
 
 from jimgw.base import LikelihoodBase
 from jimgw.prior import Prior
@@ -581,20 +581,16 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
             return -self.evaluate_original(named_params, {})
 
         print("Starting JAX GPU-accelerated optimizer")
-        # Convert objective to JAX-friendly function
-        objective = jax.jit(jax.value_and_grad(y))  # value + gradient
-
+        
         # Use prior or zeros as starting point
-        init_x = jnp.zeros(prior.n_dim)       # Use scipy.optimize.minimize to optimize the negative log-likelihood
+        initial_position = jnp.zeros(prior.n_dim)       # Use scipy.optimize.minimize to optimize the negative log-likelihood
 
-        # Create optimizer (you can choose method like "BFGS" or "Newton-CG")
-        optimizer = ScipyMinimize(fun=lambda x: objective(x)[0], method="BFGS",maxiter=n_steps)
+        result = minimize(y, initial_position, method='BFGS', options={'maxiter': n_steps, 'disp': True})
         # Run the optimizer
-        result = optimizer.run(init_x)
-
-        optimized_params = result.params
-        print(f"Optimized parameters: {optimized_params}")
-        print(f"Final negative log-likelihood: {result.state.fun_val}")
+        optimized_params = result.x
+        print("Optimization result:")
+        print(f"Optimal parameters: {optimized_params}")
+        print(f"Final negative log-likelihood: {result.fun}")
 
         # Transform back to the parameter space
         named_params = dict(zip(parameter_names, optimized_params))
