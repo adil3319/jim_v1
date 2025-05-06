@@ -8,6 +8,7 @@ from jax.scipy.special import logsumexp
 from jaxtyping import Array, Float
 from typing import Optional
 from scipy.interpolate import interp1d
+from scipy.optimize import minimize
 
 from jimgw.base import LikelihoodBase
 from jimgw.prior import Prior
