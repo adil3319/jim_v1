@@ -8,7 +8,7 @@ from jax.scipy.special import logsumexp
 from jaxtyping import Array, Float
 from typing import Optional
 from scipy.interpolate import interp1d
-from scipy.optimize import minimize
+from jaxopt import ScipyMinimize
 
 from jimgw.base import LikelihoodBase
 from jimgw.prior import Prior
@@ -580,16 +580,22 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
                 named_params = transform.forward(named_params)
             return -self.evaluate_original(named_params, {})
 
-        print("Starting the optimizer")
-        # Initial position for optimization (flattened)
-        initial_position = np.zeros(prior.n_dim)  # Assumes prior.n_dim is the number of parameters
-        # Use scipy.optimize.minimize to optimize the negative log-likelihood
-        result = minimize(y, initial_position, method='BFGS', options={'maxiter': n_steps, 'disp': True}) # # Choose an optimization method ('BFGS' or 'Nelder-Mead')
-        # Extract the optimized parameters and log-likelihood
-        optimized_params = result.x
-        print("Optimization result:")
-        print(f"Optimal parameters: {optimized_params}")
-        print(f"Final negative log-likelihood: {result.fun}")
+        print("Starting JAX GPU-accelerated optimizer")
+        # Convert objective to JAX-friendly function
+        objective = jax.jit(jax.value_and_grad(y))  # value + gradient
+
+        # Use prior or zeros as starting point
+        init_x = jnp.zeros(prior.n_dim)       # Use scipy.optimize.minimize to optimize the negative log-likelihood
+
+        # Create optimizer (you can choose method like "BFGS" or "Newton-CG")
+        optimizer = ScipyMinimize(fun=lambda x: objective(x)[0], method="BFGS",maxiter=n_steps)
+        # Run the optimizer
+        result = optimizer.run(init_x)
+
+        optimized_params = result.params
+        print(f"Optimized parameters: {optimized_params}")
+        print(f"Final negative log-likelihood: {result.state.fun_val}")
+
         # Transform back to the parameter space
         named_params = dict(zip(parameter_names, optimized_params))
         for transform in reversed(sample_transforms):
