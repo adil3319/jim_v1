@@ -626,7 +626,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         
         print("Starting Differential Evolution optimizer:")
         f = jax.jit(y)
-        y1 = jax_to_numpy_function(lambda x: -f(x))  # Wrap for scipy
+        y1 = lambda x: -f(x)  # Wrap for scipy
 
         result = differential_evolution(y1, prior) 
 
