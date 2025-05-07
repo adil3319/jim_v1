@@ -623,12 +623,12 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # best_fit = optimized_positions[jnp.argmin(summary["final_log_prob"])]
         # print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
         # Set bounds using the prior
-        bounds = []
-        for name in parameter_names:
-            lb, ub = prior.get_bounds(name)
-            bounds.append((lb, ub))
+        
         print("Starting Differential Evolution optimizer:")
-        result = differential_evolution(y,bounds,strategy="best1bin",maxiter=n_steps,popsize=popsize,polish=True,disp=True,)
+        f = jax.jit(loglikelihood)
+        y1 = jax_to_numpy_function(lambda x: -f(x))  # Wrap for scipy
+
+        result = differential_evolution(y1, prior) 
 
         best_fit = result.x
         named_params = dict(zip(parameter_names, best_fit))
