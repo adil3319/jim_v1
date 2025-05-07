@@ -625,7 +625,9 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # Set bounds using the prior
         
         print("Starting Differential Evolution optimizer:")
-        bounds = [(prior[key].minimum, prior[key].maximum) for key in prior]
+        prior_dict = prior.priors  # If it has a `.priors` dict attribute
+        bounds = [(prior_dict[key].minimum, prior_dict[key].maximum) for key in prior_dict]
+
         f = jax.jit(y)
         y1 = lambda x: -f(x)  # Wrap for scipy
 
