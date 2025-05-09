@@ -581,77 +581,48 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
             return -self.evaluate_original(named_params, {})
 
         
-        # print("Starting Adam optimizer :")
-        # optimizer = optimization_Adam(
-        #     n_steps=n_steps, learning_rate=0.001, noise_level=1
-        # )
+        print("Starting Adam optimizer :")
+        optimizer = optimization_Adam(
+            n_steps=n_steps, learning_rate=0.001, noise_level=1
+        )
         
-        # key = jax.random.PRNGKey(0)
-        # initial_position = jnp.zeros((popsize, prior.n_dim)) + jnp.nan
-        # while not jax.tree.reduce(
-        #     jnp.logical_and, jax.tree.map(lambda x: jnp.isfinite(x), initial_position)
-        # ).all():
-        #     non_finite_index = jnp.where(
-        #         jnp.any(
-        #             ~jax.tree.reduce(
-        #                 jnp.logical_and,
-        #                 jax.tree.map(lambda x: jnp.isfinite(x), initial_position),
-        #             ),
-        #             axis=1,
-        #         )
-        #     )[0]
+        key = jax.random.PRNGKey(0)
+        initial_position = jnp.zeros((popsize, prior.n_dim)) + jnp.nan
+        while not jax.tree.reduce(
+            jnp.logical_and, jax.tree.map(lambda x: jnp.isfinite(x), initial_position)
+        ).all():
+            non_finite_index = jnp.where(
+                jnp.any(
+                    ~jax.tree.reduce(
+                        jnp.logical_and,
+                        jax.tree.map(lambda x: jnp.isfinite(x), initial_position),
+                    ),
+                    axis=1,
+                )
+            )[0]
 
-        #     key, subkey = jax.random.split(key)
-        #     guess = prior.sample(subkey, popsize)
-        #     for transform in sample_transforms:
-        #         guess = jax.vmap(transform.forward)(guess)
-        #     guess = jnp.array(
-        #         jax.tree.leaves({key: guess[key] for key in parameter_names})
-        #     ).T
-        #     finite_guess = jnp.where(
-        #         jnp.all(jax.tree.map(lambda x: jnp.isfinite(x), guess), axis=1)
-        #     )[0]
-        #     common_length = min(len(finite_guess), len(non_finite_index))
-        #     initial_position = initial_position.at[
-        #         non_finite_index[:common_length]
-        #     ].set(guess[:common_length])
+            key, subkey = jax.random.split(key)
+            guess = prior.sample(subkey, popsize)
+            for transform in sample_transforms:
+                guess = jax.vmap(transform.forward)(guess)
+            guess = jnp.array(
+                jax.tree.leaves({key: guess[key] for key in parameter_names})
+            ).T
+            finite_guess = jnp.where(
+                jnp.all(jax.tree.map(lambda x: jnp.isfinite(x), guess), axis=1)
+            )[0]
+            common_length = min(len(finite_guess), len(non_finite_index))
+            initial_position = initial_position.at[
+                non_finite_index[:common_length]
+            ].set(guess[:common_length])
         
-        # rng_key, optimized_positions, summary = optimizer.optimize(
-        #     jax.random.PRNGKey(12094), y, initial_position
-        # )
+        rng_key, optimized_positions, summary = optimizer.optimize(
+            jax.random.PRNGKey(12094), y, initial_position
+        )
         
-        # best_fit = optimized_positions[jnp.argmin(summary["final_log_prob"])]
-        # print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
-        # Set bounds using the prior
+        best_fit = optimized_positions[jnp.argmin(summary["final_log_prob"])]
+        print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
         
-        print("Starting Differential Evolution optimizer:")
-
-        # Extract bounds and parameter names from CombinePrior
-        bounds = []
-        parameter_names = []
-
-        for prior in prior.base_prior:
-            if hasattr(prior, "xmin") and hasattr(prior, "xmax"):
-                    bounds.append((prior.xmin, prior.xmax))
-            elif hasattr(prior, "minimum") and hasattr(prior, "maximum"):
-                    bounds.append((prior.minimum, prior.maximum))
-            elif hasattr(prior, "parameter_names") and "iota" in prior.parameter_names:
-                     bounds.append((0.0, jnp.pi))  
-            elif "dec" in prior.parameter_names:  # CosinePrior
-                   bounds.append((0, 2*jnp.pi))
-            else:
-                raise AttributeError(f"Prior {prior} missing 'minimum' or 'maximum'.")
-
-        # Define the objective
-        f = jax.jit(y)
-        y1 = lambda x: -f(x)  # scipy.optimize minimizes, so we negate
-
-       # Run differential evolution
-        result = differential_evolution(y1, bounds)
-
-        # Convert result back into parameter dictionary
-        best_fit = result.x
-        named_params = dict(zip(parameter_names, best_fit))
 
         # Apply transforms
         for transform in reversed(sample_transforms):
