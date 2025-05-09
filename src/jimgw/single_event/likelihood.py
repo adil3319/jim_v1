@@ -625,20 +625,37 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # Set bounds using the prior
         
         print("Starting Differential Evolution optimizer:")
-        prior_dict = prior.priors  # If it has a `.priors` dict attribute
-        bounds = [(prior_dict[key].minimum, prior_dict[key].maximum) for key in prior_dict]
 
+        # Extract bounds and parameter names from CombinePrior
+        bounds = []
+        parameter_names = []
+
+        for prior in prior.base_prior:
+            if hasattr(prior, "minimum") and hasattr(prior, "maximum"):
+             # Assuming it's a single-parameter prior
+                 param_name = prior.parameter_names[0]
+                 parameter_names.append(param_name)
+                 bounds.append((prior.minimum, prior.maximum))
+            else:
+                raise AttributeError(f"Prior {prior} missing 'minimum' or 'maximum'.")
+
+        # Define the objective
         f = jax.jit(y)
-        y1 = lambda x: -f(x)  # Wrap for scipy
+        y1 = lambda x: -f(x)  # scipy.optimize minimizes, so we negate
 
-        result = differential_evolution(y1, bounds) 
+       # Run differential evolution
+        result = differential_evolution(y1, bounds)
 
+        # Convert result back into parameter dictionary
         best_fit = result.x
         named_params = dict(zip(parameter_names, best_fit))
+
+        # Apply transforms
         for transform in reversed(sample_transforms):
             named_params = transform.backward(named_params)
         for transform in likelihood_transforms:
             named_params = transform.forward(named_params)
+
         return named_params
 
 
