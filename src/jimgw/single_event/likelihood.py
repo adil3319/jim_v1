@@ -638,7 +638,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
             elif hasattr(prior, "parameter_names") and "iota" in prior.parameter_names:
                      bounds.append((0.0, jnp.pi))  
             elif "dec" in prior.parameter_names:  # CosinePrior
-                   bounds.append((0, jnp.pi))
+                   bounds.append((0, 2*jnp.pi))
             else:
                 raise AttributeError(f"Prior {prior} missing 'minimum' or 'maximum'.")
 
