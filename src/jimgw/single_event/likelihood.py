@@ -635,8 +635,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
                     bounds.append((prior.xmin, prior.xmax))
             elif hasattr(prior, "minimum") and hasattr(prior, "maximum"):
                     bounds.append((prior.minimum, prior.maximum))
-            elif isinstance(prior, SinePrior):
-                    bounds.append((0.0, np.pi))  # Default bounds for inclination
+            elif hasattr(prior, "parameter_names") and "iota" in prior.parameter_names:
+                     bounds.append((0.0, jnp.pi))  
             else:
                 raise AttributeError(f"Prior {prior} missing 'minimum' or 'maximum'.")
 
