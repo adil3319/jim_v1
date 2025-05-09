@@ -624,13 +624,13 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
         
 
-        # Apply transforms
+        named_params = dict(zip(parameter_names, best_fit))
         for transform in reversed(sample_transforms):
             named_params = transform.backward(named_params)
         for transform in likelihood_transforms:
             named_params = transform.forward(named_params)
-
         return named_params
+
 
 
 likelihood_presets = {
