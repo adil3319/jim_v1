@@ -631,11 +631,10 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         parameter_names = []
 
         for prior in prior.base_prior:
-            if hasattr(prior, "minimum") and hasattr(prior, "maximum"):
-             # Assuming it's a single-parameter prior
-                 param_name = prior.parameter_names[0]
-                 parameter_names.append(param_name)
-                 bounds.append((prior.minimum, prior.maximum))
+            if hasattr(prior, "xmin") and hasattr(prior, "xmax"):
+                    bounds.append((prior.xmin, prior.xmax))
+            elif hasattr(prior, "minimum") and hasattr(prior, "maximum"):
+                    bounds.append((prior.minimum, prior.maximum))
             else:
                 raise AttributeError(f"Prior {prior} missing 'minimum' or 'maximum'.")
 
