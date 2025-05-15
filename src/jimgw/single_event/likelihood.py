@@ -580,24 +580,19 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
                 named_params = transform.forward(named_params)
             return -self.evaluate_original(named_params, {})
 
-        bounds = [(prior[p].minimum, prior[p].maximum) for p in prior.parameter_names]
+       # bounds = [(prior[p].minimum, prior[p].maximum) for p in prior.parameter_names]
+        f = jax.jit(y)
+        y1 = lambda x: -f(x)
+    
+        result = differential_evolution(y1,prior)
 
-    # Run differential evolution
-        result = differential_evolution(
-        y,
-        bounds,
-        popsize=popsize,
-        maxiter=n_steps,
-        polish=True,  # optional: do local refinement at the end
-    )
-
-    # Return result (can also convert back to named parameters if needed)
+    
         best_fit = result.x
 
-    # Map back to named parameters in the transformed space
+    
         named_params = dict(zip(parameter_names, best_fit))
 
-    # Apply inverse transforms to recover original parameter space
+    
         for transform in reversed(sample_transforms):
              named_params = transform.backward(named_params)
         for transform in likelihood_transforms:
