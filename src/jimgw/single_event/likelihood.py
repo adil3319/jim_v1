@@ -279,8 +279,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
                 n_steps=n_steps,
             )
             self.ref_params = {key: float(value) for key, value in ref_params.items()}
-            print(f"The Reference Parameters are {self.ref_params}")
-            print("The likelihood is: ",ref_params)
+            #print(f"The Reference Parameters are {self.ref_params}")
+           # print("The likelihood is: ",ref_params)
         else:
             raise ValueError(
                 "Either reference parameters or parameter names must be provided"
@@ -423,7 +423,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
             align_time_center,
             **self.kwargs,
         )
-        print("LOG LIKELIHOOD:",log_likelihood)
+      #  print("LOG LIKELIHOOD:",log_likelihood)
         return log_likelihood
 
     def evaluate_original(
@@ -621,7 +621,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         )
         
         best_fit = optimized_positions[jnp.argmin(summary["final_log_prob"])]
-        print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
+      #  print(" maximize likelihood :",jnp.argmin(summary["final_log_prob"]),summary["final_log_prob"],min(summary["final_log_prob"]))
         
 
         named_params = dict(zip(parameter_names, best_fit))
