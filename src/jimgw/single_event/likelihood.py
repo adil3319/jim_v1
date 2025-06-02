@@ -279,7 +279,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
                 n_steps=n_steps,
             )
             self.ref_params = {key: float(value) for key, value in ref_params.items()}
-            #print(f"The Reference Parameters are {self.ref_params}")
+            print(f"The Reference Parameters are {self.ref_params}")
            # print("The likelihood is: ",ref_params)
         else:
             raise ValueError(
