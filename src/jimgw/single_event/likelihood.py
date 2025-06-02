@@ -438,15 +438,15 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         log_likelihood = 0
         frequencies = self.frequencies
         params["gmst"] = self.gmst
-        print("❌ NaN in input params BEFORE waveform:",params)
+        
         # adjust the params due to different marginalzation scheme
         params = self.param_func(params)
         # adjust the params due to fixing parameters
         params = self.fixing_func(params)
-        print("❌ NaN in params AFTER transform/fix:",params)
+        
         # evaluate the waveform as usual
         waveform_sky = self.waveform(frequencies, params)
-        print("❌ NaN in waveform:",waveform_sky.values())
+
         align_time = jnp.exp(
             -1j * 2 * jnp.pi * frequencies * (self.epoch + params["t_c"])
         )
@@ -607,18 +607,18 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
             key, subkey = jax.random.split(key)
             guess = prior.sample(subkey, popsize)
-            print("guess values:,", guess)
+            
             for transform in sample_transforms:
                 guess = jax.vmap(transform.forward)(guess)
-                print("guess values after ST:,", guess)
+                
             guess = jnp.array(
                 jax.tree.leaves({key: guess[key] for key in parameter_names})
             ).T
-            print("guess values at jnp:,", guess)
+            
             finite_guess = jnp.where(
                 jnp.all(jax.tree.map(lambda x: jnp.isfinite(x), guess), axis=1)
             )[0]
-            print("Finite guess values:,", finite_guess)
+            
             common_length = min(len(finite_guess), len(non_finite_index))
             initial_position = initial_position.at[
                 non_finite_index[:common_length]
