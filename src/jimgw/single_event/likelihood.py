@@ -438,18 +438,15 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         log_likelihood = 0
         frequencies = self.frequencies
         params["gmst"] = self.gmst
-        if any(jnp.isnan(x).any() for x in params.values()):
-           print("❌ NaN in input params BEFORE waveform:")
+        print("❌ NaN in input params BEFORE waveform:",params)
         # adjust the params due to different marginalzation scheme
         params = self.param_func(params)
         # adjust the params due to fixing parameters
         params = self.fixing_func(params)
-        if any(jnp.isnan(x).any() for x in params.values()):
-            print("❌ NaN in params AFTER transform/fix:")
+        print("❌ NaN in params AFTER transform/fix:",params)
         # evaluate the waveform as usual
         waveform_sky = self.waveform(frequencies, params)
-        if any(jnp.isnan(x).any() for x in waveform_sky.values()):
-          print("❌ NaN in waveform:")
+        print("❌ NaN in waveform:",waveform_sky.values())
         align_time = jnp.exp(
             -1j * 2 * jnp.pi * frequencies * (self.epoch + params["t_c"])
         )
