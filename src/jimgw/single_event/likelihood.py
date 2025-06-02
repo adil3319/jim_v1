@@ -315,6 +315,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
             jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0
         )
         f_valid = frequency_original[jnp.where(h_amp > 0)[0]]
+        print(" h amplitide", max(h_amp),f_valid)
         f_max = jnp.max(f_valid)
         f_min = jnp.min(f_valid)
 
