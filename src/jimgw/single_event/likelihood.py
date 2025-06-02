@@ -604,6 +604,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
             key, subkey = jax.random.split(key)
             guess = prior.sample(subkey, popsize)
+            print("guess values:,", guess)
             for transform in sample_transforms:
                 guess = jax.vmap(transform.forward)(guess)
             guess = jnp.array(
