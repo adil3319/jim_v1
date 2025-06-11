@@ -36,7 +36,7 @@ class ZeroLikelihood(LikelihoodBase):
         return 0.0
 
 
-class TransientLikelihoodFD(SingleEventLiklihood):
+class TransientLikelihoodFD_original(SingleEventLiklihood):
     def __init__(
         self,
         detectors: list[Detector],
@@ -153,6 +153,139 @@ class TransientLikelihoodFD(SingleEventLiklihood):
         params = self.fixing_func(params)
         # evaluate the waveform as usual
         waveform_sky = self.waveform(frequencies, params)
+        align_time = jnp.exp(
+            -1j * 2 * jnp.pi * frequencies * (self.epoch + params["t_c"])
+        )
+        log_likelihood = self.likelihood_function(
+            params,
+            waveform_sky,
+            self.detectors,
+            frequencies,
+            align_time,
+            **self.kwargs,
+        )
+        return log_likelihood
+class TransientLikelihoodFD(SingleEventLiklihood):
+    def __init__(
+        self,
+        detectors: list[Detector],
+        waveform: Waveform,
+        trigger_time: float = 0,
+        duration: float = 4,
+        post_trigger_duration: float = 2,
+        **kwargs,
+    ) -> None:
+        self.detectors = detectors
+        assert jnp.all(
+            jnp.array(
+                [
+                    (self.detectors[0].frequencies == detector.frequencies).all()  # type: ignore
+                    for detector in self.detectors
+                ]
+            )
+        ), "The detectors must have the same frequency grid"
+        self.frequencies = self.detectors[0].frequencies  # type: ignore
+        self.waveform = waveform
+        self.trigger_time = trigger_time
+        self.gmst = (
+            Time(trigger_time, format="gps").sidereal_time("apparent", "greenwich").rad
+        )
+
+        self.duration = duration
+        self.post_trigger_duration = post_trigger_duration
+        self.kwargs = kwargs
+
+        if "marginalization" in self.kwargs:
+            marginalization = self.kwargs["marginalization"]
+            assert marginalization in [
+                "phase",
+                "phase-time",
+                "time",
+            ], "Only support time, phase and phase+time marginalization"
+            self.marginalization = marginalization
+            if self.marginalization == "phase-time":
+                self.param_func = lambda x: {**x, "phase_c": 0.0, "t_c": 0.0}
+                self.likelihood_function = phase_time_marginalized_likelihood
+                print("Marginalizing over phase and time")
+            elif self.marginalization == "time":
+                self.param_func = lambda x: {**x, "t_c": 0.0}
+                self.likelihood_function = time_marginalized_likelihood
+                print("Marginalizing over time")
+            elif self.marginalization == "phase":
+                self.param_func = lambda x: {**x, "phase_c": 0.0}
+                self.likelihood_function = phase_marginalized_likelihood
+                print("Marginalizing over phase")
+
+            if "time" in self.marginalization:
+                fs = kwargs["sampling_rate"]
+                self.kwargs["tc_array"] = jnp.fft.fftfreq(
+                    int(duration * fs / 2), 1.0 / duration
+                )
+                self.kwargs["pad_low"] = jnp.zeros(int(self.frequencies[0] * duration))
+                if jnp.isclose(self.frequencies[-1], fs / 2.0 - 1.0 / duration):
+                    self.kwargs["pad_high"] = jnp.array([])
+                else:
+                    self.kwargs["pad_high"] = jnp.zeros(
+                        int(
+                            (fs / 2.0 - 1.0 / duration - self.frequencies[-1])
+                            * duration
+                        )
+                    )
+        else:
+            self.param_func = lambda x: x
+            self.likelihood_function = original_likelihood
+            self.marginalization = ""
+
+        # 🔧 Fixing parameters handling
+        if "fixing_parameters" in self.kwargs:
+            self.fixing_parameters = self.kwargs["fixing_parameters"]
+            print(f"Parameters are fixed {self.fixing_parameters}")
+            assert not (
+                "t_c" in self.fixing_parameters and "time" in self.marginalization
+            ), "Cannot fix t_c and marginalize over time"
+            assert not (
+                "phase_c" in self.fixing_parameters and "phase" in self.marginalization
+            ), "Cannot fix phase_c and marginalize over phase"
+            self.fixing_func = lambda x: {**x, **self.fixing_parameters}
+        else:
+            self.fixing_parameters = {}
+            self.fixing_func = lambda x: x
+
+        # 🔧 Optional: save transforms (if any are passed in via kwargs)
+        self.transforms = kwargs.get("likelihood_transforms", [])
+
+    @property
+    def epoch(self):
+        return self.duration - self.post_trigger_duration
+
+    @property
+    def ifos(self):
+        return [detector.name for detector in self.detectors]
+
+    # 🔧 NEW: apply transforms with fixing_func applied first
+    def apply_transforms(self, params: dict[str, Float]) -> dict[str, Float]:
+        # Ensure fixed parameters are injected BEFORE transforms
+        params = self.fixing_func(params)
+        for transform in self.transforms:
+            params = transform(params)
+        return params
+
+    def evaluate(self, params: dict[str, Float], data: dict) -> Float:
+        """
+        Evaluate the likelihood for a given set of parameters.
+        """
+        frequencies = self.frequencies
+        params["gmst"] = self.gmst
+
+        # 🔧 Inject fixed values + apply transforms BEFORE marginalization
+        params = self.apply_transforms(params)
+
+        # Apply marginalization (e.g., override t_c or phase_c if needed)
+        params = self.param_func(params)
+
+        # Evaluate waveform
+        waveform_sky = self.waveform(frequencies, params)
+
         align_time = jnp.exp(
             -1j * 2 * jnp.pi * frequencies * (self.epoch + params["t_c"])
         )
