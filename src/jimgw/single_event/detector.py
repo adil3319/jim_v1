@@ -443,7 +443,7 @@ H1 = GroundBased2G(
     xarm_tilt=-6.195e-4,
     yarm_tilt=1.25e-5,
     elevation=142.554,
-    mode="pc",
+    mode="pcb",
 )
 
 L1 = GroundBased2G(
@@ -455,7 +455,7 @@ L1 = GroundBased2G(
     xarm_tilt=0,
     yarm_tilt=0,
     elevation=-6.574,
-    mode="pc",
+    mode="pcb",
 )
 
 V1 = GroundBased2G(
@@ -467,7 +467,7 @@ V1 = GroundBased2G(
     xarm_tilt=0,
     yarm_tilt=0,
     elevation=51.884,
-    mode="pc",
+    mode="pcb",
 )
 
 detector_preset = {
