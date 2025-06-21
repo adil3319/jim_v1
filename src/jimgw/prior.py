@@ -234,6 +234,44 @@ class CombinePrior(Prior):
 
 
 @jaxtyped(typechecker=typechecker)
+class UniformPrior2(Prior):
+    xmin: float = 0.0
+    xmax: float = 1.0
+
+    def __repr__(self):
+        return f"Uniform(xmin={self.xmin}, xmax={self.xmax})"
+
+    def __init__(
+        self,
+        xmin: Float,
+        xmax: Float,
+        parameter_names: list[str],
+        **kwargs,
+    ):
+        super().__init__(parameter_names)
+        assert self.n_dim == 1, "Uniform needs to be 1D distributions"
+        self.xmax = xmax
+        self.xmin = xmin
+
+    def sample(
+        self, rng_key: PRNGKeyArray, n_samples: int
+    ) -> dict[str, Float[Array, " n_samples"]]:
+        samples = jax.random.uniform(
+            rng_key, (n_samples,), minval=self.xmin, maxval=self.xmax
+        )
+        return self.add_name(samples[None])
+
+    def log_prob(self, x: dict[str, Array]) -> Float:
+        variable = x[self.parameter_names[0]]
+        output = jnp.where(
+            (variable >= self.xmax) | (variable <= self.xmin),
+            jnp.zeros_like(variable) - jnp.inf,
+            jnp.zeros_like(variable),
+        )
+        return output + jnp.log(1.0 / (self.xmax - self.xmin))
+
+
+@jaxtyped(typechecker=typechecker)
 class UniformPrior(SequentialTransformPrior):
     xmin: float
     xmax: float
