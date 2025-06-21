@@ -233,7 +233,7 @@ class CombinePrior(Prior):
         return output
 
 
-@jaxtyped(typechecker=typechecker)
+#@jaxtyped(typechecker=typechecker)
 class UniformPrior2(Prior):
     xmin: float 
     xmax: float 
@@ -271,7 +271,7 @@ class UniformPrior2(Prior):
         return output + jnp.log(1.0 / (self.xmax - self.xmin))
 
 
-#@jaxtyped(typechecker=typechecker)
+@jaxtyped(typechecker=typechecker)
 class UniformPrior(SequentialTransformPrior):
     xmin: float
     xmax: float
