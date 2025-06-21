@@ -235,8 +235,8 @@ class CombinePrior(Prior):
 
 @jaxtyped(typechecker=typechecker)
 class UniformPrior2(Prior):
-    xmin: float = 0.0
-    xmax: float = 1.0
+    xmin: float 
+    xmax: float 
 
     def __repr__(self):
         return f"Uniform(xmin={self.xmin}, xmax={self.xmax})"
@@ -271,7 +271,7 @@ class UniformPrior2(Prior):
         return output + jnp.log(1.0 / (self.xmax - self.xmin))
 
 
-@jaxtyped(typechecker=typechecker)
+#@jaxtyped(typechecker=typechecker)
 class UniformPrior(SequentialTransformPrior):
     xmin: float
     xmax: float
