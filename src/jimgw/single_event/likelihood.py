@@ -313,6 +313,11 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         h_amp = jnp.sum(
             jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0
         )
+        ####### lines modifued to make the waveform zero above maximum amplitude##
+        max_amp_index = jnp.argmax(h_amp)
+        for key in h_sky.keys():
+              h_sky[key] = h_sky[key].at[max_amp_index:].set(0.0)
+        ##############################################################
         f_valid = frequency_original[jnp.where(h_amp > 0)[0]]
        # print(" h amplitide", max(h_amp),f_valid, h_sky.keys(),h_sky,frequency_original,self.ref_params)
         f_max = jnp.max(f_valid)
