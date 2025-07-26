@@ -305,9 +305,11 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         self.A1_array = {}
         self.B0_array = {}
         self.B1_array = {}
+        import matplotlib.pyplot as plt
+        import copy
 
         h_sky = reference_waveform(frequency_original, self.ref_params)
-
+        h_sky_before = copy.deepcopy(h_sky)
         # Get frequency masks to be applied, for both original
         # and heterodyne frequency grid
         h_amp = jnp.sum(
@@ -317,6 +319,24 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         max_amp_index = jnp.argmax(h_amp)
         for key in h_sky.keys():
               h_sky[key] = h_sky[key].at[max_amp_index:].set(0.0)
+
+        plt.figure(figsize=(12, 6))
+
+        for key in h_sky.keys():
+               amp_before = jnp.abs(h_sky_before[key])
+               amp_after = jnp.abs(h_sky[key])
+               plt.plot(frequency_original, amp_before, label=f'{key} (before)')
+               plt.plot(frequency_original, amp_after, linestyle='--', label=f'{key} (after)')
+        # Add vertical line at max amp frequency
+        plt.axvline(frequency_original[max_amp_index], color='red', linestyle=':', label='Max Amplitude Frequency')
+        plt.xlabel("Frequency (Hz)")
+        plt.ylabel("Amplitude |h(f)|")
+        plt.title("Individual Polarization Amplitudes Before and After Zeroing")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+        
         ##############################################################
         f_valid = frequency_original[jnp.where(h_amp > 0)[0]]
        # print(" h amplitide", max(h_amp),f_valid, h_sky.keys(),h_sky,frequency_original,self.ref_params)
