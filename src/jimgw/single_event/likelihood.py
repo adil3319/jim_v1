@@ -323,8 +323,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         plt.figure(figsize=(12, 6))
 
         # Extract 'plus' component only (raw complex values)
-        waveform_before = h_sky_before['plus']
-        waveform_after = h_sky['plus']
+        waveform_before = h_sky_before['p']
+        waveform_after = h_sky['p']
         # Plot real parts (or imaginary, or both — depending on what you want)
         plt.figure(figsize=(10, 5))
         plt.plot(frequency_original, waveform_before.real, label='plus (before)')
