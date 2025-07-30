@@ -315,10 +315,19 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         h_amp = jnp.sum(
             jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0
         )
-        ####### lines modifued to make the waveform zero above maximum amplitude##
-        max_amp_index = jnp.argmax(h_amp)
+        ####### lines modified to make the waveform zero above maximum amplitude##
+        cf =1.4765e3
+        c1=2.998e8
+        f_maximum = 0.018/((self.ref_params["M_c"]/self.ref_params["eta"]**0.6)*(cf/c1))
+        # Compute index where frequency exceeds f_maximum
+        cutoff_index = jnp.argmax(frequency_original > f_maximum)
+        # If f_maximum is beyond the frequency range, don't apply zeroing
+        if frequency_original[-1] <= f_maximum:
+             cutoff_index = None
+
         for key in h_sky.keys():
-              h_sky[key] = h_sky[key].at[max_amp_index:].set(0.0)
+              if cutoff_index is not None:
+                   h_sky[key] = h_sky[key].at[cutoff_index:].set(0.0)
 
         plt.figure(figsize=(12, 6))
 
