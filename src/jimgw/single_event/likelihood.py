@@ -336,12 +336,12 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         waveform_after = h_sky['p']
         # Plot real parts (or imaginary, or both — depending on what you want)
         plt.figure(figsize=(10, 5))
-        plt.plot(frequency_original, waveform_before.real, label='plus (before)')
-        plt.plot(frequency_original, waveform_after.real, linestyle='--', label='plus (after)')
+        plt.plot(frequency_original, 1e23*waveform_before.real, label='plus (before)')
+        plt.plot(frequency_original, 1e23*waveform_after.real, linestyle='--', label='plus (after)')
         # Mark the frequency at which waveform is zeroed
         plt.axvline(frequency_original[cutoff_index], color='red', linestyle=':', label='Max Amplitude Frequency')
         plt.xlabel("Frequency (Hz)")
-        plt.ylabel("Real(h_plus(f))")
+        plt.ylabel("Real(h_plus(f))*1e23")
         plt.title("Plus Polarization Before and After Zeroing (Real Part)")
         plt.legend()
         plt.grid(True)
