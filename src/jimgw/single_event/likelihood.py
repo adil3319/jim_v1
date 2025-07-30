@@ -342,6 +342,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         plt.axvline(frequency_original[cutoff_index], color='red', linestyle=':', label='Max Amplitude Frequency')
         plt.xlabel("Frequency (Hz)")
         plt.ylabel("Real(h_plus(f))*1e23")
+        plt.xlim(1250,2000)
+        plt.ylim(-0.05,0.05)
         plt.title("Plus Polarization Before and After Zeroing (Real Part)")
         plt.legend()
         plt.grid(True)
