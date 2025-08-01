@@ -310,11 +310,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
         h_sky = reference_waveform(frequency_original, self.ref_params)
         h_sky_before = copy.deepcopy(h_sky)
-        # Get frequency masks to be applied, for both original
-        # and heterodyne frequency grid
-        h_amp = jnp.sum(
-            jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0
-        )
+        
         ####### lines modified to make the waveform zero above maximum amplitude##
         cf =1.4765e3
         c1=2.998e8
@@ -328,7 +324,9 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         for key in h_sky.keys():
               if cutoff_index is not None:
                    h_sky[key] = h_sky[key].at[cutoff_index:].set(0.0)
-
+        # Get frequency masks to be applied, for both original
+        # and heterodyne frequency grid
+        h_amp = jnp.sum(jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0)
         plt.figure(figsize=(12, 6))
 
         # Extract 'plus' component only (raw complex values)
