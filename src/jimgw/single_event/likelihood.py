@@ -328,7 +328,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # # and heterodyne frequency grid
         h_amp = jnp.sum(jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0)
         plt.figure(figsize=(12, 6))
-        c_strain = jnp.abs(h_sky['p'])*frequency_original
+        c_strain = jnp.abs(h_sky['p'])*frequency_original**2
         # Extract 'plus' component only (raw complex values)
         # waveform_before = h_sky_before['p']
         # waveform_after = h_sky['p']
