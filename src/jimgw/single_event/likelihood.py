@@ -327,8 +327,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # # Get frequency masks to be applied, for both original
         # # and heterodyne frequency grid
         h_amp = jnp.sum(jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0)
-        plt.figure(figsize=(12, 6))
-        c_strain = jnp.abs(h_sky['p'])*frequency_original**2
+        #plt.figure(figsize=(12, 6))
+        #c_strain = jnp.abs(h_sky['p'])*frequency_original**2
         # Extract 'plus' component only (raw complex values)
         # waveform_before = h_sky_before['p']
         # waveform_after = h_sky['p']
@@ -348,11 +348,11 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # plt.grid(True)
         # plt.tight_layout()
         # plt.show()
-        plt.plot(frequency_original, c_strain, label='c_strain')
-        plt.grid(True)
-        plt.tight_layout()
-        plt.savefig("c_strain_h_amp.pdf")
-        plt.show()
+        #plt.plot(frequency_original, c_strain, label='c_strain')
+        #plt.grid(True)
+        #plt.tight_layout()
+        #plt.savefig("c_strain_h_amp.pdf")
+        #plt.show()
         ##############################################################
         f_valid = frequency_original[jnp.where(h_amp > 0)[0]]
        # print(" h amplitide", max(h_amp),f_valid, h_sky.keys(),h_sky,frequency_original,self.ref_params)
