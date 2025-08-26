@@ -9,7 +9,7 @@ from jaxtyping import Array, Float, PRNGKeyArray, jaxtyped
 from beartype import beartype as typechecker
 from scipy.interpolate import interp1d
 from scipy.signal.windows import tukey
-
+import matplotlib.pyplot as plt
 from jimgw.constants import C_SI, EARTH_SEMI_MAJOR_AXIS, EARTH_SEMI_MINOR_AXIS
 from jimgw.single_event.wave import Polarization
 
