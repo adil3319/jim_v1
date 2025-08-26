@@ -9,7 +9,7 @@ from jaxtyping import Array, Float
 from typing import Optional
 from scipy.interpolate import interp1d
 from scipy.optimize import differential_evolution
-from jimgw.single_event.detector import antenna_pattern
+from jimgw.single_event.detector import GroundBased2G
 from jimgw.base import LikelihoodBase
 from jimgw.prior import Prior
 from jimgw.single_event.detector import Detector
