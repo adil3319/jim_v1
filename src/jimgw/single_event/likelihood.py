@@ -351,6 +351,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
 
         # Unpack components
+        ra, dec, psi, gmst = params["ra"], params["dec"], params["psi"], params["gmst"]
+        antenna_pattern = self.antenna_pattern(ra, dec, psi, gmst)
         h_plus = h_sky["p"]
         h_cross = h_sky["c"]
         h_breathing = h_sky["b"]
