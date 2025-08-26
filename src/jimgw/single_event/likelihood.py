@@ -309,23 +309,23 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         import copy
 
         h_sky = reference_waveform(frequency_original, self.ref_params)
-        # h_sky_before = copy.deepcopy(h_sky)
+        h_sky_before = copy.deepcopy(h_sky)
         
-        # ####### lines modified to make the waveform zero above maximum amplitude##
-        # cf =1.4765e3
-        # c1=2.998e8
-        # f_maximum = 0.018/((self.ref_params["M_c"]/self.ref_params["eta"]**0.6)*(cf/c1))
-        # # Compute index where frequency exceeds f_maximum
-        # cutoff_index = jnp.argmax(frequency_original > f_maximum)
-        # # If f_maximum is beyond the frequency range, don't apply zeroing
-        # if frequency_original[-1] <= f_maximum:
-        #      cutoff_index = None
+        ####### lines modified to make the waveform zero above maximum amplitude##
+        cf =1.4765e3
+        c1=2.998e8
+        f_maximum = 0.018/((self.ref_params["M_c"]/self.ref_params["eta"]**0.6)*(cf/c1))
+        # Compute index where frequency exceeds f_maximum
+        cutoff_index = jnp.argmax(frequency_original > f_maximum)
+        # If f_maximum is beyond the frequency range, don't apply zeroing
+        if frequency_original[-1] <= f_maximum:
+             cutoff_index = None
 
-        # for key in h_sky.keys():
-        #       if cutoff_index is not None:
-        #            h_sky[key] = h_sky[key].at[cutoff_index:].set(0.0)
-        # # Get frequency masks to be applied, for both original
-        # # and heterodyne frequency grid
+        for key in h_sky.keys():
+              if cutoff_index is not None:
+                   h_sky[key] = h_sky[key].at[cutoff_index:].set(0.0)
+        # Get frequency masks to be applied, for both original
+        # and heterodyne frequency grid
         h_amp = jnp.sum(jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0)
         #plt.figure(figsize=(12, 6))
         #c_strain = jnp.abs(h_sky['p'])*frequency_original**2
@@ -333,21 +333,21 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # waveform_before = h_sky_before['p']
         # waveform_after = h_sky['p']
         
-        # # Plot real parts (or imaginary, or both — depending on what you want)
-        # plt.figure(figsize=(10, 5))
-        # plt.plot(frequency_original, 1e23*waveform_before.real, label='plus (before)')
-        # plt.plot(frequency_original, 1e23*waveform_after.real, linestyle='--', label='plus (after)')
-        # # Mark the frequency at which waveform is zeroed
-        # plt.axvline(frequency_original[cutoff_index], color='red', linestyle=':', label='Max Amplitude Frequency')
-        # plt.xlabel("Frequency (Hz)")
-        # plt.ylabel("Real(h_plus(f))*1e23")
-        # plt.xlim(1250,2000)
-        # plt.ylim(-0.05,0.05)
-        # plt.title("Plus Polarization Before and After Zeroing (Real Part)")
-        # plt.legend()
-        # plt.grid(True)
-        # plt.tight_layout()
-        # plt.show()
+        # Plot real parts (or imaginary, or both — depending on what you want)
+        plt.figure(figsize=(10, 5))
+        plt.plot(frequency_original, 1e23*waveform_before.real, label='plus (before)')
+        plt.plot(frequency_original, 1e23*waveform_after.real, linestyle='--', label='plus (after)')
+        # Mark the frequency at which waveform is zeroed
+        plt.axvline(frequency_original[cutoff_index], color='red', linestyle=':', label='Max Amplitude Frequency')
+        plt.xlabel("Frequency (Hz)")
+        plt.ylabel("Real(h_plus(f))*1e23")
+        plt.xlim(1250,2000)
+        plt.ylim(-0.05,0.05)
+        plt.title("Plus Polarization Before and After Zeroing (Real Part)")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
         #plt.plot(frequency_original, c_strain, label='c_strain')
         #plt.grid(True)
         #plt.tight_layout()
