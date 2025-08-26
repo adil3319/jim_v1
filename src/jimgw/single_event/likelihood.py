@@ -351,12 +351,12 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
 
         # Unpack components
-        h_plus = h_sky["plus"]
-        h_cross = h_sky["cross"]
-        h_breathing = h_sky["breathing"]
-        F_plus = antenna_pattern["plus"]
-        F_cross = antenna_pattern["cross"]
-        F_breathing = antenna_pattern["breathing"]
+        h_plus = h_sky["p"]
+        h_cross = h_sky["c"]
+        h_breathing = h_sky["b"]
+        F_plus = antenna_pattern["p"]
+        F_cross = antenna_pattern["c"]
+        F_breathing = antenna_pattern["b"]
         # Compute contributions
         h_tensor = F_plus * h_plus + F_cross * h_cross
         h_breathing_only = F_breathing * h_breathing
