@@ -348,14 +348,41 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+
+
+        # Unpack components
+        h_plus = h_sky["plus"]
+        h_cross = h_sky["cross"]
+        h_breathing = h_sky["breathing"]
+        F_plus = antenna_pattern["plus"]
+        F_cross = antenna_pattern["cross"]
+        F_breathing = antenna_pattern["breathing"]
+        # Compute contributions
+        h_tensor = F_plus * h_plus + F_cross * h_cross
+        h_breathing_only = F_breathing * h_breathing
+        # Compute amplitudes
+        amp_tensor = jnp.abs(h_tensor)
+        amp_breathing = jnp.abs(h_breathing_only)
+        # Plot
+        plt.figure(figsize=(10, 6))
+        plt.plot(frequency, amp_tensor, label="|F₊h₊ + F×h×| (Tensor Modes)")
+        plt.plot(frequency, amp_breathing, label="|F_b h_b| (Breathing Mode)", linestyle="--")
+        plt.xlabel("Frequency [Hz]")
+        plt.ylabel("Amplitude")
+        plt.title("Detector Response Components")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+       
         #plt.plot(frequency_original, c_strain, label='c_strain')
         #plt.grid(True)
         #plt.tight_layout()
-        #plt.savefig("c_strain_h_amp.pdf")
+        plt.savefig("apmlitude_plot.pdf")
         #plt.show()
         ##############################################################
         f_valid = frequency_original[jnp.where(h_amp > 0)[0]]
-       # print(" h amplitide", max(h_amp),f_valid, h_sky.keys(),h_sky,frequency_original,self.ref_params)
+        # print(" h amplitide", max(h_amp),f_valid, h_sky.keys(),h_sky,frequency_original,self.ref_params)
         f_max = jnp.max(f_valid)
         f_min = jnp.min(f_valid)
 
