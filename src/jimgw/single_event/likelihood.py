@@ -9,7 +9,7 @@ from jaxtyping import Array, Float
 from typing import Optional
 from scipy.interpolate import interp1d
 from scipy.optimize import differential_evolution
-
+from detector import antenna_pattern
 from jimgw.base import LikelihoodBase
 from jimgw.prior import Prior
 from jimgw.single_event.detector import Detector
@@ -351,8 +351,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 
 
         # Unpack components
-        ra, dec, psi, gmst = params["ra"], params["dec"], params["psi"], params["gmst"]
-        antenna_pattern = self.antenna_pattern(ra, dec, psi, gmst)
+        #ra, dec, psi, gmst = params["ra"], params["dec"], params["psi"], params["gmst"]
+       # antenna_pattern = self.antenna_pattern(ra, dec, psi, gmst)
         h_plus = h_sky["p"]
         h_cross = h_sky["c"]
         h_breathing = h_sky["b"]
