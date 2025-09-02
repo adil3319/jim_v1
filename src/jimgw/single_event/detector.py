@@ -274,33 +274,33 @@ class GroundBased2G(Detector):
         ra, dec, psi, gmst = params["ra"], params["dec"], params["psi"], params["gmst"]
         antenna_pattern = self.antenna_pattern(ra, dec, psi, gmst)
 
-         # Unpack components
-        print("parameters",params)
-        h_plus = h_sky["p"]
-        h_cross = h_sky["c"]
-        h_breathing = h_sky["b"]
-        F_plus = antenna_pattern["p"]
-        F_cross = antenna_pattern["c"]
-        F_breathing = antenna_pattern["b"]
-        # Compute contributions
-        h_tensor = F_plus * h_plus + F_cross * h_cross
-        h_breathing_only = F_breathing * h_breathing
-        # Compute amplitudes
-        amp_tensor = jnp.abs(h_tensor)
-        amp_breathing = jnp.abs(h_breathing_only)
-        # Plot
-        plt.figure(figsize=(10, 6))
-        plt.plot(frequency, amp_tensor, label="|F₊h₊ + F×h×| (Tensor Modes)")
-        plt.plot(frequency, amp_breathing, label="|F_b h_b| (Breathing Mode)", linestyle="--")
-        plt.xlabel("Frequency [Hz]")
-        plt.ylabel("Amplitude")
-        plt.title("Detector Response Components")
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+        #  # Unpack components
+        # print("parameters",params)
+        # h_plus = h_sky["p"]
+        # h_cross = h_sky["c"]
+        # h_breathing = h_sky["b"]
+        # F_plus = antenna_pattern["p"]
+        # F_cross = antenna_pattern["c"]
+        # F_breathing = antenna_pattern["b"]
+        # # Compute contributions
+        # h_tensor = F_plus * h_plus + F_cross * h_cross
+        # h_breathing_only = F_breathing * h_breathing
+        # # Compute amplitudes
+        # amp_tensor = jnp.abs(h_tensor)
+        # amp_breathing = jnp.abs(h_breathing_only)
+        # # Plot
+        # plt.figure(figsize=(10, 6))
+        # plt.plot(frequency, amp_tensor, label="|F₊h₊ + F×h×| (Tensor Modes)")
+        # plt.plot(frequency, amp_breathing, label="|F_b h_b| (Breathing Mode)", linestyle="--")
+        # plt.xlabel("Frequency [Hz]")
+        # plt.ylabel("Amplitude")
+        # plt.title("Detector Response Components")
+        # plt.legend()
+        # plt.grid(True)
+        # plt.tight_layout()
+        # plt.show()
     
-        plt.savefig("apmlitude_plot.pdf")
+       # plt.savefig("apmlitude_plot.pdf")
         timeshift = self.delay_from_geocenter(ra, dec, gmst)
         h_detector = jax.tree_util.tree_map(
             lambda h, antenna: h
