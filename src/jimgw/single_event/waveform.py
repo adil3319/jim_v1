@@ -76,7 +76,7 @@ class RippleIMRPhenomD_ScalarTensor(Waveform):
         cf =1.4765e3
         c=2.998e8
         u=(jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
-        a,b=0,-7
+        a,b=0,-5
         a1 = 0
         hpT = hp*(1+theta[-3]*u**a)*jnp.exp(1.0j*theta[-2]*u**b)
         hcT = hc*(1+theta[-3]*u**a)*jnp.exp(1.0j*theta[-2]*u**b)
