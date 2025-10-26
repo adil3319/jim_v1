@@ -315,7 +315,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         cf =1.4765e3
         c1=2.998e8
         #f_maximum = 0.018/((self.ref_params["M_c"]/self.ref_params["eta"]**0.6)*(cf/c1))
-        f_maximum = 2000
+        f_maximum = 800
         # Compute index where frequency exceeds f_maximum
         cutoff_index = jnp.argmax(frequency_original > f_maximum)
         # If f_maximum is beyond the frequency range, don't apply zeroing
