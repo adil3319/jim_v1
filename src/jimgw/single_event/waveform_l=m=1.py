@@ -209,7 +209,7 @@ def get_IIb_raw_phase(fM_s: Array, theta: Array, coeffs: Array, f_RD, f_damp) ->
 
 def get_Amp0(fM_s: Array, eta: float) -> Array:
     Amp0 = (
-        (2.0 / 3.0 * eta) ** (1.0 / 2.0) * (fM_s) ** (-7.0 / 6.0) * PI ** (-1.0 / 6.0)
+        (4.0 * eta/ (3.0*PI) ) ** (1.0 / 2.0) * (fM_s) ** (-9.0 / 6.0)
     )
     return Amp0
 
