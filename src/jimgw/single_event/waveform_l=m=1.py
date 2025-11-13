@@ -159,7 +159,7 @@ def get_inspiral_phase(fM_s: Array, theta: Array, coeffs: Array) -> Array:
         + phi6_log * jnp.log(v) * ((2.0*PI * fM_s) ** (1.0 / 3.0))
         + phi6 * ((2.0*PI * fM_s) ** (1.0 / 3.0))
         + phi7 * ((2.0*PI * fM_s) ** (2.0 / 3.0))
-    ) * (3.0 / (128.0 * eta)) - PI / 4.0
+    ) * (3.0 / (256.0 * eta)) - PI / 4.0
     phi_Ins = (
         phi_TF2
         + (
@@ -545,7 +545,7 @@ def _gen_IMRPhenomD(
     Mf_ref = f_ref * M_s
     Psi_ref = Phase(f_ref, theta_intrinsic, coeffs, transition_freqs)
     Psi -= t0 * ((f * M_s) - Mf_ref) + Psi_ref
-    ext_phase_contrib = 2.0 * PI * f * theta_extrinsic[1] - 2 * theta_extrinsic[2]
+    ext_phase_contrib = 2.0 * PI * f * theta_extrinsic[1] -  theta_extrinsic[2]
     Psi += ext_phase_contrib
     fcut_above = lambda f: (fM_CUT / M_s)
     fcut_below = lambda f: f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
@@ -645,7 +645,7 @@ def gen_IMRPhenomD_hphchb_lm_1(f: Array, params: Array, f_ref: float):
 
     hp = h0 * (1 / 2 * (1 + jnp.cos(iota) ** 2))
     hc = -1j * h0 * jnp.cos(iota)
-    hb = jnp.sqrt(3/2)* h0 * (jnp.sin(iota))
+    hb = - jnp.sqrt(24/5)* h0 * (jnp.sin(iota))
 
     return hp, hc, hb
 
@@ -715,12 +715,13 @@ class RippleIMRPhenomD_ScalarTensor(Waveform):
                 params["alphaB"],
             ]
         )
-        hp, hc, hb = gen_IMRPhenomD_hphchb(frequency, theta, self.f_ref)
+       # hp, hc, hb = gen_IMRPhenomD_hphchb(frequency, theta, self.f_ref)
+        hp, hc, hb = gen_IMRPhenomD_hphchb_lm_1(frequency, theta, self.f_ref)
         cf =1.4765e3
         c=2.998e8
-        u=(jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
-        a,b=0,-7
-        a1 = 0
+        u=(2*jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
+        a,b=-2,-7
+        a1 = -2
         hpT = hp*(1+theta[-3]*u**a)*jnp.exp(1.0j*theta[-2]*u**b)
         hcT = hc*(1+theta[-3]*u**a)*jnp.exp(1.0j*theta[-2]*u**b)
         hbT = hb*theta[-1]*(u**a1)*jnp.exp(1.0j*theta[-2]*u**b)
