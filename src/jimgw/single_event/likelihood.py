@@ -315,29 +315,51 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         cf =1.4765e3
         c1=2.998e8
         f_maximum = 0.018/((self.ref_params["M_c"]/self.ref_params["eta"]**0.6)*(cf/c1))
-       # f_maximum = 2000
-        # Compute index where frequency exceeds f_maximum
-        cutoff_index = jnp.argmax(frequency_original > f_maximum)
-        # If f_maximum is beyond the frequency range, don't apply zeroing
+############################################ l = m =1 #############################################################
+        # Compute cutoff indices for different modes
+        cutoff_index_general = jnp.argmax(frequency_original > f_maximum)
+        cutoff_index_breathing = jnp.argmax(frequency_original > (f_maximum / 2))
+        # Handle case where cutoff is beyond frequency range
         if frequency_original[-1] <= f_maximum:
-             cutoff_index = None
-
+                   cutoff_index_general = None
+        if frequency_original[-1] <= (f_maximum / 2):
+                   cutoff_index_breathing = None
+        # Zero-out modes above their respective cutoff frequencies
         for key in h_sky.keys():
-              if cutoff_index is not None:
-                   h_sky[key] = h_sky[key].at[cutoff_index:].set(0.0)
-        # Get frequency masks to be applied, for both original
-        # and heterodyne frequency grid
-        h_amp = jnp.sum(jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0)
-        #plt.figure(figsize=(12, 6))
-        #c_strain = jnp.abs(h_sky['p'])*frequency_original**2
-        # Extract 'plus' component only (raw complex values)
-        waveform_before = h_sky_before['p']
-        waveform_after = h_sky['p']
+            if key == "b":  # Breathing mode
+                if cutoff_index_breathing is not None:
+                    h_sky[key] = h_sky[key].at[cutoff_index_breathing:].set(0.0)
+        else:  # All other modes
+            if cutoff_index_general is not None:
+                 h_sky[key] = h_sky[key].at[cutoff_index_general:].set(0.0)
+
+        # Compute amplitude sum across all modes
+        h_amp = jnp.sum(jnp.abs(jnp.stack([h_sky[key] for key in h_sky.keys()])), axis=0)
+
+###################################### l = m = 2 ####################################################################
+       # # f_maximum = 2000
+       #  # Compute index where frequency exceeds f_maximum
+       #  cutoff_index = jnp.argmax(frequency_original > f_maximum)
+       #  # If f_maximum is beyond the frequency range, don't apply zeroing
+       #  if frequency_original[-1] <= f_maximum:
+       #       cutoff_index = None
+
+       #  for key in h_sky.keys():
+       #        if cutoff_index is not None:
+       #             h_sky[key] = h_sky[key].at[cutoff_index:].set(0.0)
+       #  # Get frequency masks to be applied, for both original
+       #  # and heterodyne frequency grid
+       #  h_amp = jnp.sum(jnp.array([jnp.abs(h_sky[key]) for key in h_sky.keys()]), axis=0)
+       #  #plt.figure(figsize=(12, 6))
+       #  #c_strain = jnp.abs(h_sky['p'])*frequency_original**2
+       #  # Extract 'plus' component only (raw complex values)
+        waveform_before = h_sky_before['b']
+        waveform_after = h_sky['b']
         
         # Plot real parts (or imaginary, or both — depending on what you want)
         plt.figure(figsize=(10, 5))
-        plt.plot(frequency_original, 1e23*waveform_before.real, label='plus (before)')
-        plt.plot(frequency_original, 1e23*waveform_after.real, linestyle='--', label='plus (after)')
+        plt.plot(frequency_original, 1e23*waveform_before.real, label='b (before)')
+        plt.plot(frequency_original, 1e23*waveform_after.real, linestyle='--', label='b (after)')
         # Mark the frequency at which waveform is zeroed
         plt.axvline(frequency_original[cutoff_index], color='red', linestyle=':', label='Max Amplitude Frequency')
         plt.xlabel("Frequency (Hz)")
