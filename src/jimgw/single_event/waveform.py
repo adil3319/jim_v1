@@ -12,7 +12,7 @@ from jaxtyping import Array, Float
 
 import jax
 import jax.numpy as jnp
-from .IMRPhenomD_utils import (
+from ripplegw.waveforms.IMRPhenomD_utils import (
     get_coeffs,
     get_delta0,
     get_delta1,
@@ -22,9 +22,9 @@ from .IMRPhenomD_utils import (
     get_transition_frequencies,
 )
 
-from .IMRPhenomD_QNMdata import fM_CUT
-from ..constants import EulerGamma, gt, m_per_Mpc, C, PI
-from ..typing import Array
+from ripplegw.waveforms.IMRPhenomD_QNMdata import fM_CUT
+from ripplegw.constants import EulerGamma, gt, m_per_Mpc, C, PI
+from ripplegw.typing import Array
 from ripplegw import Mc_eta_to_ms
 
 #############################modified IMR_PhenomD for l=m= 1#########################################################
