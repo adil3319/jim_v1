@@ -436,7 +436,7 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
     beta1_correction = dphi_Ins_f1 - dphi_IIa_f1
     beta0 = phi_Ins_f1 - beta1_correction * (f1 * M_s) - phi_IIa_f1
 
-    phi_IIa_func = (
+    phi_IIa_func_lm_1 = (
         lambda fM_s: get_IIa_raw_phase_lm_1(fM_s, theta, coeffs) + beta1_correction * fM_s
     )
     phi_IIa = phi_IIa_func_lm_1(f * M_s) + beta0
