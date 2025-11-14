@@ -3,9 +3,9 @@ from abc import ABC
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 #from ripplegw.waveforms.IMRPhenomD import gen_IMRPhenomD_hphc, gen_IMRPhenomD
-from ripplegw.waveforms.IMRPhenomPv2 import gen_IMRPhenomPv2_hphc
-from ripplegw.waveforms.TaylorF2 import gen_TaylorF2_hphc
-from ripplegw.waveforms.IMRPhenomD_NRTidalv2 import gen_IMRPhenomD_NRTidalv2_hphc
+#from ripplegw.waveforms.IMRPhenomPv2 import gen_IMRPhenomPv2_hphc
+#from ripplegw.waveforms.TaylorF2 import gen_TaylorF2_hphc
+#from ripplegw.waveforms.IMRPhenomD_NRTidalv2 import gen_IMRPhenomD_NRTidalv2_hphc
 
 
 # from math import pi
