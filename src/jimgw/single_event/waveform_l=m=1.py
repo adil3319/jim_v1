@@ -1228,12 +1228,14 @@ class RippleIMRPhenomD_ScalarTensor(Waveform):
         hp, hc, hb = gen_IMRPhenomD_hphchb_lm_1(frequency, theta, self.f_ref)
         cf =1.4765e3
         c=2.998e8
-        u=(2*jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
+
+        uT=(jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3)
+        uS=(2*jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
         a,b=-2,-7
         a1 = -2
-        hpT = hp*(1+theta[-3]*u**a)*jnp.exp(1.0j*theta[-2]*u**b)
-        hcT = hc*(1+theta[-3]*u**a)*jnp.exp(1.0j*theta[-2]*u**b)
-        hbT = hb*theta[-1]*(u**a1)*jnp.exp(1.0j*theta[-2]*u**b)
+        hpT = hp*(1+theta[-3]*uT**a)*jnp.exp(1.0j*theta[-2]*uT**b)
+        hcT = hc*(1+theta[-3]*uT**a)*jnp.exp(1.0j*theta[-2]*uT**b)
+        hbT = hb*theta[-1]*(uS**a1)*jnp.exp(1.0j*theta[-2]*uS**b)
         
         output["p"] = hpT
         output["c"] = hcT
