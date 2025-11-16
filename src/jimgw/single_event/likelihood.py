@@ -353,15 +353,15 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
        #  #plt.figure(figsize=(12, 6))
        #  #c_strain = jnp.abs(h_sky['p'])*frequency_original**2
        #  # Extract 'plus' component only (raw complex values)
-        waveform_before = h_sky_before['b']
-        waveform_after = h_sky['b']
+        waveform_before = h_sky_before['c']
+        waveform_after = h_sky['c']
         
         # Plot real parts (or imaginary, or both — depending on what you want)
         plt.figure(figsize=(10, 5))
         plt.plot(frequency_original, 1e23*waveform_before.real, label='b (before)')
         plt.plot(frequency_original, 1e23*waveform_after.real, linestyle='--', label='b (after)')
         # Mark the frequency at which waveform is zeroed
-        plt.axvline(frequency_original[cutoff_index_breathing], color='red', linestyle=':', label='Max Amplitude Frequency')
+        plt.axvline(frequency_original[cutoff_index_general], color='red', linestyle=':', label='Max Amplitude Frequency')
         plt.xlabel("Frequency (Hz)")
         plt.ylabel("Real(h_b(f))*1e23")
        # plt.xlim(600,700)
