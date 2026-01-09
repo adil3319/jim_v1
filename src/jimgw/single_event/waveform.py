@@ -146,19 +146,19 @@ def get_inspiral_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
     ) * chi2
 
     # Add frequency dependence here
-    v = (2.0*PI * fM_s) ** (1.0 / 3.0)
+    v = (PI * fM_s) ** (1.0 / 3.0)
 
     phi_TF2 = (
-        phi0 * ((2.0*PI * fM_s) ** -(5.0 / 3.0))
-        + phi1 * ((2.0*PI * fM_s) ** -(4.0 / 3.0))
-        + phi2 * ((2.0*PI * fM_s) ** -1.0)
-        + phi3 * ((2.0*PI * fM_s) ** -(2.0 / 3.0))
-        + phi4 * ((2.0*PI * fM_s) ** -(1.0 / 3.0))
+        phi0 * ((PI * fM_s) ** -(5.0 / 3.0))
+        + phi1 * ((PI * fM_s) ** -(4.0 / 3.0))
+        + phi2 * ((PI * fM_s) ** -1.0)
+        + phi3 * ((PI * fM_s) ** -(2.0 / 3.0))
+        + phi4 * ((PI * fM_s) ** -(1.0 / 3.0))
         + phi5_log * jnp.log(v)
         + phi5
-        + phi6_log * jnp.log(v) * ((2.0*PI * fM_s) ** (1.0 / 3.0))
-        + phi6 * ((2.0*PI * fM_s) ** (1.0 / 3.0))
-        + phi7 * ((2.0*PI * fM_s) ** (2.0 / 3.0))
+        + phi6_log * jnp.log(v) * ((PI * fM_s) ** (1.0 / 3.0))
+        + phi6 * ((PI * fM_s) ** (1.0 / 3.0))
+        + phi7 * ((PI * fM_s) ** (2.0 / 3.0))
     ) * (3.0 / (256.0 * eta)) - PI / 4.0
     phi_Ins = (
         phi_TF2
@@ -209,7 +209,7 @@ def get_IIb_raw_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array, f_RD, f_dam
 
 def get_Amp0_lm_1(fM_s: Array, eta: float) -> Array:
     Amp0 = (
-        (4.0 * eta/ (3.0*PI) ) ** (1.0 / 2.0) * (fM_s) ** (-9.0 / 6.0)
+        (2.0 / 3.0 * eta) ** (1.0 / 2.0) * (fM_s) ** (-7.0 / 6.0) * PI ** (-1.0 / 6.0)
     )
     return Amp0
 
@@ -522,6 +522,11 @@ def Amp_lm_1(
 
     # Need to add in an overall scaling of M_s^2 to make the units correct
     dist_s = (D * m_per_Mpc) / C
+    Am2 = Amp0*(M_s**2.0) / dist_s
+    Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
+    import matplot.pyplot as plt
+    plt.scatter(f,Am2)
+    plt.scatter(f,Am3)
     return Amp0 * Amp * (M_s**2.0) / dist_s
 
 
