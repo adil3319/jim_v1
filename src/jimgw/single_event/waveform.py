@@ -527,6 +527,7 @@ def Amp_lm_1(
     import matplotlib.pyplot as plt
     plt.scatter(f,Am2)
     plt.scatter(f,Am3)
+    print("Percentage :",(Am3-Am2)*100/Am3)
     return Amp0 * Amp * (M_s**2.0) / dist_s
 
 
@@ -1157,9 +1158,9 @@ def gen_IMRPhenomD_hphchb_lm_1(f: Array, params: Array, f_ref: float):
     h0T = gen_IMRPhenomD(f, params, f_ref)[0]
     h0S = gen_IMRPhenomD(f, params, f_ref)[1]
 
-    hp = h0 * (1 / 2 * (1 + jnp.cos(iota) ** 2))
-    hc = -1j * h0 * jnp.cos(iota)
-    hb = jnp.sqrt(3/2)* h0 * (jnp.sin(iota))**2
+    hp = h0T * (1 / 2 * (1 + jnp.cos(iota) ** 2))
+    hc = -1j * h0T * jnp.cos(iota)
+    hb = jnp.sqrt(3/2)* h0S * (jnp.sin(iota))**2
 
     return hp, hc, hb
 
