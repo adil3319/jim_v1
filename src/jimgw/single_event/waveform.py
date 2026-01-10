@@ -524,7 +524,7 @@ def Amp_lm_1(
     dist_s = (D * m_per_Mpc) / C
     Am2 = Amp0*(M_s**2.0) / dist_s
     Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
-    import matplot.pyplot as plt
+    import matplotlib.pyplot as plt
     plt.scatter(f,Am2)
     plt.scatter(f,Am3)
     return Amp0 * Amp * (M_s**2.0) / dist_s
