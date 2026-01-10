@@ -525,9 +525,8 @@ def Amp_lm_1(
     Am2 = Amp0*(M_s**2.0) / dist_s
     Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
     import matplotlib.pyplot as plt
-    plt.scatter(f,Am2)
-    plt.scatter(f,Am3)
-    print("Percentage :",(Am3-Am2)*100/Am3)
+    err = (Am3-Am2)*100/Am3
+    plt.scatter(f,err)
     return Amp0 * Amp * (M_s**2.0) / dist_s
 
 
