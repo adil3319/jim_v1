@@ -322,7 +322,7 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         # Handle case where cutoff is beyond frequency range
         if frequency_original[-1] <= f_maximum:
                    cutoff_index_general = None
-        if frequency_original[-1] <= (f_maximum / 2):
+        if frequency_original[-1] <= (f_maximum): ## for l = m = 2
                    cutoff_index_breathing = None
         # Zero-out modes above their respective cutoff frequencies
         for key in h_sky.keys():
