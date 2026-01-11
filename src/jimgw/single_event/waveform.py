@@ -522,11 +522,11 @@ def Amp_lm_1(
 
     # Need to add in an overall scaling of M_s^2 to make the units correct
     dist_s = (D * m_per_Mpc) / C
-    Am2 = Amp0*(M_s**2.0) / dist_s
-    Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
-    import matplotlib.pyplot as plt
-    err = (Am3-Am2)*100/Am3
-    plt.scatter(f,err)
+    # Am2 = Amp0*(M_s**2.0) / dist_s
+    # Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
+    # import matplotlib.pyplot as plt
+    # err = (Am3-Am2)*100/Am3
+    # plt.scatter(f,err)
     return Amp0 * (M_s**2.0) / dist_s #Amp0 * Amp * (M_s**2.0) / dist_s
 
 
