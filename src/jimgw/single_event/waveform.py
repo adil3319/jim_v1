@@ -516,9 +516,9 @@ def Amp_lm_1(
     )
 
     # Prefactor
-    Amp0 = get_Amp0_lm_1(f * M_s, eta) #* (
-   #     2.0 * jnp.sqrt(5.0 / (64.0 * PI))
-  #  )  # This second factor is from lalsuite
+    Amp0 = get_Amp0_lm_1(f * M_s, eta) * (
+        2.0 * jnp.sqrt(5.0 / (64.0 * PI))
+    )  # This second factor is from lalsuite
 
     # Need to add in an overall scaling of M_s^2 to make the units correct
     dist_s = (D * m_per_Mpc) / C
