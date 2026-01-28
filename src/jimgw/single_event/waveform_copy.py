@@ -329,9 +329,9 @@ def get_inspiral_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
         + A5 * (fM_s ** (5.0 / 3.0))
         + A6 * (fM_s**2.0)
         # Now we add the coefficient terms
-        + A7 * (fM_s ** (7.0 / 3.0))
-        + A8 * (fM_s ** (8.0 / 3.0))
-        + A9 * (fM_s**3.0)
+       # + A7 * (fM_s ** (7.0 / 3.0))
+       # + A8 * (fM_s ** (8.0 / 3.0))
+       # + A9 * (fM_s**3.0)
     )
 
     return Amp_Ins
@@ -522,12 +522,16 @@ def Amp_lm_1(
 
     # Need to add in an overall scaling of M_s^2 to make the units correct
     dist_s = (D * m_per_Mpc) / C
-    # Am2 = Amp0*(M_s**2.0) / dist_s
-    # Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
-    # import matplotlib.pyplot as plt
-    # err = (Am3-Am2)*100/Am3
-    # plt.scatter(f,err)
-    return Amp0 * (M_s**2.0) / dist_s #Amp0 * Amp * (M_s**2.0) / dist_s
+    Am11 = Amp0*Amp_Ins*(M_s**2.0) / dist_s
+    Am2 = Amp0*(M_s**2.0) / dist_s
+    Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
+    import matplotlib.pyplot as plt
+    err1 = (Am3-Am2)*100/Am3
+    err2 = (Am3-Am11)*100/Am3
+    
+    plt.scatter(f,err1,label="leading order")
+    plt.scatter(f,err2,label="A_ins_first_7_coeffs")
+    return Amp0 *Amp_Ins*(M_s**2.0) / dist_s #Amp0 * Amp * (M_s**2.0) / dist_s
 
 
 # @jax.jit
