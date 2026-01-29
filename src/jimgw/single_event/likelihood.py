@@ -318,11 +318,11 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
 ############################################ l = m =1 #############################################################
         # Compute cutoff indices for different modes
         cutoff_index_general = jnp.argmax(frequency_original > f_maximum)
-        cutoff_index_breathing = jnp.argmax(frequency_original > (f_maximum))
+        cutoff_index_breathing = jnp.argmax(frequency_original > (1000))
         # Handle case where cutoff is beyond frequency range
         if frequency_original[-1] <= f_maximum:
                    cutoff_index_general = None
-        if frequency_original[-1] <= (f_maximum): ## for l = m = 2
+        if frequency_original[-1] <= (1000): ## for l = m = 2
                    cutoff_index_breathing = None
         # Zero-out modes above their respective cutoff frequencies
         for key in h_sky.keys():
