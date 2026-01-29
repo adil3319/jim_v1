@@ -562,7 +562,7 @@ def _gen_IMRPhenomD_lm_1(
     fcut_below = lambda f: f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
     fcut_true = jax.lax.cond((fM_CUT / M_s) > f[-1], fcut_above, fcut_below, f)
     # fcut_true = f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
-    Psi_original = Psi * jnp.heaviside(fcut_true - f, 0.0) + 2.0 * PI * jnp.heaviside(
+    Psi = Psi * jnp.heaviside(fcut_true - f, 0.0) + 2.0 * PI * jnp.heaviside(
         f - fcut_true, 1.0
     )
 
