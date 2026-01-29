@@ -1165,7 +1165,7 @@ def gen_IMRPhenomD_hphchb_lm_1(f: Array, params: Array, f_ref: float):
 
     hp = h0T * (1 / 2 * (1 + jnp.cos(iota) ** 2))
     hc = -1j * h0T * jnp.cos(iota)
-    hb = jnp.sqrt(3/2)* h0S * (jnp.sin(iota))**2
+    hb = jnp.sqrt(3/2)* h0T * (jnp.sin(iota))**2
 
     return hp, hc, hb
 
