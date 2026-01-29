@@ -329,9 +329,9 @@ def get_inspiral_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
         + A5 * (fM_s ** (5.0 / 3.0))
         + A6 * (fM_s**2.0)
         # Now we add the coefficient terms
-       # + A7 * (fM_s ** (7.0 / 3.0))
-       # + A8 * (fM_s ** (8.0 / 3.0))
-       # + A9 * (fM_s**3.0)
+       + A7 * (fM_s ** (7.0 / 3.0))
+       + A8 * (fM_s ** (8.0 / 3.0))
+       + A9 * (fM_s**3.0)
     )
 
     return Amp_Ins
