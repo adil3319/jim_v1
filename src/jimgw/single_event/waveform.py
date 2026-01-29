@@ -467,7 +467,7 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
         + phi_IIb * jnp.heaviside(f - f2, 0.5)
     )
 
-    return phi_Ins #phase
+    return phase
 
 
 # @jax.jit
