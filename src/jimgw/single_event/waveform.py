@@ -394,7 +394,7 @@ def get_IIb_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array, f_RD, f_damp) -> 
 
 # @jax.jit
 def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -> Array:
-    """
+     """
     Computes the phase of the PhenomD waveform following 1508.07253.
     Sets time and phase of coealence to be zero.
 
@@ -436,7 +436,7 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
     beta1_correction = dphi_Ins_f1 - dphi_IIa_f1
     beta0 = phi_Ins_f1 - beta1_correction * (f1 * M_s) - phi_IIa_f1
 
-    phi_IIa_func_lm_1 = (
+    phi_IIa_func = (
         lambda fM_s: get_IIa_raw_phase_lm_1(fM_s, theta, coeffs) + beta1_correction * fM_s
     )
     phi_IIa = phi_IIa_func_lm_1(f * M_s) + beta0
@@ -446,8 +446,8 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
     # ==> phi_IIb'(f2*M_s) + a1_correction = phi_IIa'(f2*M_s)
     # ==> a1_correction = phi_IIa'(f2*M_s) - phi_IIb'(f2*M_s)
     # ==> a0 = phi_IIa(f2*M_s) - phi_IIb(f2*M_s) - beta1_correction*(f2*M_s)
-    phi_IIa_f2, dphi_IIa_f2 = jax.value_and_grad(phi_IIa_func_lm_1)(f2 * M_s)
-    phi_IIb_f2, dphi_IIb_f2 = jax.value_and_grad(get_IIb_raw_phase_lm_1)(
+    phi_IIa_f2, dphi_IIa_f2 = jax.value_and_grad(phi_IIa_func)(f2 * M_s)
+    phi_IIb_f2, dphi_IIb_f2 = jax.value_and_grad(get_IIb_raw_phase)(
         f2 * M_s, theta, coeffs, f_RD, f_damp
     )
 
@@ -466,13 +466,12 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
         + jnp.heaviside(f - f1, 0.5) * phi_IIa * jnp.heaviside(f2 - f, 0.5)
         + phi_IIb * jnp.heaviside(f - f2, 0.5)
     )
-
     return phase
 
 
 # @jax.jit
 def Amp_lm_1(
-    f: Array, theta: Array, coeffs: Array, transition_frequencies: Array, D=1
+  f: Array, theta: Array, coeffs: Array, transition_frequencies: Array, D=1
 ) -> Array:
     """
     Computes the amplitude of the PhenomD frequency domain waveform following 1508.07253.
@@ -556,20 +555,20 @@ def _gen_IMRPhenomD_lm_1(
     Mf_ref = f_ref * M_s
     Psi_ref = Phase_lm_1(f_ref, theta_intrinsic, coeffs, transition_freqs)
     Psi -= t0 * ((f * M_s) - Mf_ref) + Psi_ref
-    ext_phase_contrib = 2.0 * PI * f * theta_extrinsic[1] -  2*theta_extrinsic[2]
+    ext_phase_contrib = 2.0 * PI * f * theta_extrinsic[1] - 2*theta_extrinsic[2]
     Psi += ext_phase_contrib
     fcut_above = lambda f: (fM_CUT / M_s)
     fcut_below = lambda f: f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
     fcut_true = jax.lax.cond((fM_CUT / M_s) > f[-1], fcut_above, fcut_below, f)
     # fcut_true = f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
-    Psi = Psi * jnp.heaviside(fcut_true - f, 0.0) + 2.0 * PI * jnp.heaviside(
+    Psi= Psi * jnp.heaviside(fcut_true - f, 0.0) + 2.0 * PI * jnp.heaviside(
         f - fcut_true, 1.0
     )
 
     A = Amp_lm_1(f, theta_intrinsic, coeffs, transition_freqs, D=theta_extrinsic[0])
 
-    h0 = A * jnp.exp(1j * -Psi)
-    return h0
+    h0S = A * jnp.exp(1j * -Psi)
+    return h0S
 ############################################ l = m = 2 ##########################################################
 def get_inspiral_phase(fM_s: Array, theta: Array, coeffs: Array) -> Array:
     """
@@ -1165,7 +1164,7 @@ def gen_IMRPhenomD_hphchb_lm_1(f: Array, params: Array, f_ref: float):
 
     hp = h0T * (1 / 2 * (1 + jnp.cos(iota) ** 2))
     hc = -1j * h0T * jnp.cos(iota)
-    hb = jnp.sqrt(3/2)* h0T * (jnp.sin(iota))**2
+    hb = jnp.sqrt(3/2)* h0S * (jnp.sin(iota))**2
 
     return hp, hc, hb
 
