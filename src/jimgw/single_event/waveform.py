@@ -532,7 +532,7 @@ def Amp_lm_1(
     # plt.scatter(f,err2,label="A_ins_first_7_coeffs")
     #plt.legend()
    # plt.savefig("Relative Amplitude.pdf")
-    return Amp0 * Amp0 * (M_s**2.0) / dist_s
+    return Amp0* (M_s**2.0) / dist_s
 
 
 # @jax.jit
