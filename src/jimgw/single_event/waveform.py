@@ -426,10 +426,10 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
     # ==> phi_IIa'(f1*M_s) + beta1_correction = phi_Ins'(f1*M_s)
     # ==> beta1_correction = phi_Ins'(f1*M_s) - phi_IIa'(f1*M_s)
     # ==> beta0 = phi_Ins(f1*M_s) - phi_IIa(f1*M_s) - beta1_correction*(f1*M_s)
-    phi_Ins_f1, dphi_Ins_f1 = jax.value_and_grad(get_inspiral_phase)(
+    phi_Ins_f1, dphi_Ins_f1 = jax.value_and_grad(get_inspiral_phase_lm_1)(
         f1 * M_s, theta, coeffs
     )
-    phi_IIa_f1, dphi_IIa_f1 = jax.value_and_grad(get_IIa_raw_phase)(
+    phi_IIa_f1, dphi_IIa_f1 = jax.value_and_grad(get_IIa_raw_phase_lm_1)(
         f1 * M_s, theta, coeffs
     )
 
@@ -439,7 +439,7 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
     phi_IIa_func = (
         lambda fM_s: get_IIa_raw_phase_lm_1(fM_s, theta, coeffs) + beta1_correction * fM_s
     )
-    phi_IIa = phi_IIa_func_lm_1(f * M_s) + beta0
+    phi_IIa = phi_IIa_func(f * M_s) + beta0
 
     # And finally, we do the same thing to get the phase of the merger-ringdown (region IIb)
     # phi_IIb(f2*M_s) + a0 + a1_correction*(f2*M_s) = phi_IIa(f2*M_s)
@@ -447,7 +447,7 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
     # ==> a1_correction = phi_IIa'(f2*M_s) - phi_IIb'(f2*M_s)
     # ==> a0 = phi_IIa(f2*M_s) - phi_IIb(f2*M_s) - beta1_correction*(f2*M_s)
     phi_IIa_f2, dphi_IIa_f2 = jax.value_and_grad(phi_IIa_func)(f2 * M_s)
-    phi_IIb_f2, dphi_IIb_f2 = jax.value_and_grad(get_IIb_raw_phase)(
+    phi_IIb_f2, dphi_IIb_f2 = jax.value_and_grad(get_IIb_raw_phase_lm_1)(
         f2 * M_s, theta, coeffs, f_RD, f_damp
     )
 
