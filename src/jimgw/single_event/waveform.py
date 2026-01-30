@@ -394,7 +394,7 @@ def get_IIb_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array, f_RD, f_damp) -> 
 
 # @jax.jit
 def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -> Array:
-     """
+    """
     Computes the phase of the PhenomD waveform following 1508.07253.
     Sets time and phase of coealence to be zero.
 
