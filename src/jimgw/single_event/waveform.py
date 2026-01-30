@@ -170,7 +170,7 @@ def get_inspiral_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
         )
         / eta
     )
-    return phi_TF2
+    return phi_Ins
 
 
 def get_IIa_raw_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
