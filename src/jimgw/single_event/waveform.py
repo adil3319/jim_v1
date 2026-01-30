@@ -170,7 +170,7 @@ def get_inspiral_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
         )
         / eta
     )
-    return phi_Ins
+    return phi_TF2
 
 
 def get_IIa_raw_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
@@ -329,9 +329,9 @@ def get_inspiral_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
         + A5 * (fM_s ** (5.0 / 3.0))
         + A6 * (fM_s**2.0)
         # Now we add the coefficient terms
-       + A7 * (fM_s ** (7.0 / 3.0))
-       + A8 * (fM_s ** (8.0 / 3.0))
-       + A9 * (fM_s**3.0)
+       # + A7 * (fM_s ** (7.0 / 3.0))
+       # + A8 * (fM_s ** (8.0 / 3.0))
+       # + A9 * (fM_s**3.0)
     )
 
     return Amp_Ins
@@ -466,7 +466,7 @@ def Phase_lm_1(f: Array, theta: Array, coeffs: Array, transition_freqs: Array) -
         + jnp.heaviside(f - f1, 0.5) * phi_IIa * jnp.heaviside(f2 - f, 0.5)
         + phi_IIb * jnp.heaviside(f - f2, 0.5)
     )
-    return phase
+    return phi_Ins #phase
 
 
 # @jax.jit
@@ -532,7 +532,7 @@ def Amp_lm_1(
     # plt.scatter(f,err2,label="A_ins_first_7_coeffs")
     #plt.legend()
    # plt.savefig("Relative Amplitude.pdf")
-    return Amp0 * Amp * (M_s**2.0) / dist_s
+    return Amp0 * Amp_Ins * (M_s**2.0) / dist_s
 
 
 # @jax.jit
@@ -561,7 +561,7 @@ def _gen_IMRPhenomD_lm_1(
     fcut_below = lambda f: f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
     fcut_true = jax.lax.cond((fM_CUT / M_s) > f[-1], fcut_above, fcut_below, f)
     # fcut_true = f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
-    Psi= Psi * jnp.heaviside(fcut_true - f, 0.0) + 2.0 * PI * jnp.heaviside(
+    Psi_original= Psi * jnp.heaviside(fcut_true - f, 0.0) + 2.0 * PI * jnp.heaviside(
         f - fcut_true, 1.0
     )
 
