@@ -336,6 +336,127 @@ def get_inspiral_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
 
     return Amp_Ins
 
+def get_inspiral_Amp_lm_1_comp(fM_s: Array, theta: Array, coeffs: Array) -> Array:
+    # Below is taken from https://git.ligo.org/lscsoft/lalsuite/-/blob/master/lalsimulation/lib/LALSimIMRPhenomD_internals.c
+    # Lines 302 --> 351
+    m1, m2, chi1, chi2 = theta
+    m1_s = m1 * gt
+    m2_s = m2 * gt
+    M_s = m1_s + m2_s
+    eta = m1_s * m2_s / (M_s**2.0)
+    eta2 = eta * eta
+    eta3 = eta * eta2
+
+    Seta = jnp.sqrt(1.0 - 4.0 * eta)
+    SetaPlus1 = 1.0 + Seta
+
+    # Spin variables
+    chi12 = chi1 * chi1
+    chi22 = chi2 * chi2
+
+    # First lets construct the Amplitude in the inspiral (region I)
+    A0 = 1.0
+    A2 = ((-969.0 + 1804.0 * eta) * PI ** (2.0 / 3.0)) / 672.0
+    A3 = (
+        (
+            chi1 * (81.0 * SetaPlus1 - 44.0 * eta)
+            + chi2 * (81.0 - 81.0 * Seta - 44.0 * eta)
+        )
+        * PI
+    ) / 48.0
+    A4 = (
+        (
+            -27312085.0
+            - 10287648.0 * chi22
+            - 10287648.0 * chi12 * SetaPlus1
+            + 10287648.0 * chi22 * Seta
+            + 24.0
+            * (
+                -1975055.0
+                + 857304.0 * chi12
+                - 994896.0 * chi1 * chi2
+                + 857304.0 * chi22
+            )
+            * eta
+            + 35371056.0 * eta2
+        )
+        * (PI ** (4.0 / 3.0))
+    ) / 8.128512e6
+
+    A5 = (
+        (PI ** (5.0 / 3.0))
+        * (
+            chi2
+            * (
+                -285197.0 * (-1 + Seta)
+                + 4 * (-91902.0 + 1579.0 * Seta) * eta
+                - 35632.0 * eta2
+            )
+            + chi1
+            * (
+                285197.0 * SetaPlus1
+                - 4.0 * (91902.0 + 1579.0 * Seta) * eta
+                - 35632.0 * eta2
+            )
+            + 42840.0 * (-1.0 + 4.0 * eta) * PI
+        )
+    ) / 32256.0
+
+    A6 = (
+        -(
+            (PI**2.0)
+            * (
+                -336.0
+                * (
+                    -3248849057.0
+                    + 2943675504.0 * chi12
+                    - 3339284256.0 * chi1 * chi2
+                    + 2943675504.0 * chi22
+                )
+                * eta2
+                - 324322727232.0 * eta3
+                - 7.0
+                * (
+                    -177520268561.0
+                    + 107414046432.0 * chi22
+                    + 107414046432.0 * chi12 * SetaPlus1
+                    - 107414046432.0 * chi22 * Seta
+                    + 11087290368.0 * (chi1 + chi2 + chi1 * Seta - chi2 * Seta) * PI
+                )
+                + 12.0
+                * eta
+                * (
+                    -545384828789.0
+                    - 176491177632.0 * chi1 * chi2
+                    + 202603761360.0 * chi22
+                    + 77616.0 * chi12 * (2610335.0 + 995766.0 * Seta)
+                    - 77287373856.0 * chi22 * Seta
+                    + 5841690624.0 * (chi1 + chi2) * PI
+                    + 21384760320.0 * (PI**2.0)
+                )
+            )
+        )
+        / 6.0085960704e10
+    )
+    A7 = coeffs[0]
+    A8 = coeffs[1]
+    A9 = coeffs[2]
+
+    Amp_Ins = (
+        A0
+        # A1 is missed since its zero
+        + A2 * (fM_s ** (2.0 / 3.0))
+        + A3 * fM_s
+        + A4 * (fM_s ** (4.0 / 3.0))
+        + A5 * (fM_s ** (5.0 / 3.0))
+        + A6 * (fM_s**2.0)
+        # Now we add the coefficient terms
+        + A7 * (fM_s ** (7.0 / 3.0))
+        + A8 * (fM_s ** (8.0 / 3.0))
+        + A9 * (fM_s**3.0)
+    )
+
+    return Amp_Ins
 
 def get_IIa_Amp_lm_1(
     fM_s: Array, theta: Array, coeffs: Array, f1, f3, f_RD, f_damp
@@ -495,6 +616,7 @@ def Amp_lm_1(
 
     # First we get the inspiral amplitude
     Amp_Ins = get_inspiral_Amp_lm_1(f * M_s, theta, coeffs)
+    Amp_Ins_comp = get_inspiral_Amp_lm_1_comp(f * M_s, theta, coeffs)
 
     # Next lets construct the phase of the late inspiral (region IIa)
     # Note that this part is a little harder since we need to solve a system of equations for deltas
@@ -508,7 +630,7 @@ def Amp_lm_1(
     fcut_below = lambda f: f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
     fcut_true = jax.lax.cond((fM_CUT / M_s) > f[-1], fcut_above, fcut_below, f)
     Amp = (
-        Amp_Ins * jnp.heaviside(f3 - f, 0.5)
+        Amp_Ins_comp * jnp.heaviside(f3 - f, 0.5)
         + jnp.heaviside(f - f3, 0.5) * Amp_IIa * jnp.heaviside(f4 - f, 0.5)
         + jnp.heaviside(f - f4, 0.5) * Amp_IIb * jnp.heaviside(fcut_true - f, 0.0)
         + 0.0 * jnp.heaviside(f - fcut_true, 1.0)
@@ -521,17 +643,17 @@ def Amp_lm_1(
 
     # Need to add in an overall scaling of M_s^2 to make the units correct
     dist_s = (D * m_per_Mpc) / C
-    # Am11 = Amp0*Amp_Ins*(M_s**2.0) / dist_s
-    # Am2 = Amp0*(M_s**2.0) / dist_s
-    # Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
+    Am11 = Amp0*Amp_Ins*(M_s**2.0) / dist_s
+    Am2 = Amp0*(M_s**2.0) / dist_s
+    Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
     # import matplotlib.pyplot as plt
-    # err1 = (Am3-Am2)*100/Am3
-    # err2 = (Am3-Am11)*100/Am3
+    err1 = (Am3-Am2)*100/Am3
+    err2 = (Am3-Am11)*100/Am3
     
-    # plt.scatter(f,err1,label="leading order")
-    # plt.scatter(f,err2,label="A_ins_first_7_coeffs")
+    plt.scatter(f,err1,label="leading order")
+    plt.scatter(f,err2,label="A_ins_first_7_coeffs")
     #plt.legend()
-   # plt.savefig("Relative Amplitude.pdf")
+    plt.savefig("Relative Amplitude_new.pdf")
     return Amp0*Amp_Ins*(M_s**2.0) / dist_s
 
 
