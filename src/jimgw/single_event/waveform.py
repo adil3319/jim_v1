@@ -646,7 +646,7 @@ def Amp_lm_1(
     Am11 = Amp0*Amp_Ins*(M_s**2.0) / dist_s
     Am2 = Amp0*(M_s**2.0) / dist_s
     Am3 = Amp0 * Amp * (M_s**2.0) / dist_s
-    # import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
     err1 = (Am3-Am2)*100/Am3
     err2 = (Am3-Am11)*100/Am3
     
