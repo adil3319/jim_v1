@@ -146,20 +146,20 @@ def get_inspiral_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
     ) * chi2
 
     # Add frequency dependence here
-    v = (PI * fM_s) ** (1.0 / 3.0)
+    v = (2.0*PI * fM_s) ** (1.0 / 3.0)
 
     phi_TF2 = (
-        phi0 * ((PI * fM_s) ** -(5.0 / 3.0))
-        + phi1 * ((PI * fM_s) ** -(4.0 / 3.0))
-        + phi2 * ((PI * fM_s) ** -1.0)
-        + phi3 * ((PI * fM_s) ** -(2.0 / 3.0))
-        + phi4 * ((PI * fM_s) ** -(1.0 / 3.0))
+        phi0 * ((2.0*PI * fM_s) ** -(5.0 / 3.0))
+        + phi1 * ((2.0*PI * fM_s) ** -(4.0 / 3.0))
+        + phi2 * ((2.0*PI * fM_s) ** -1.0)
+        + phi3 * ((2.0*PI * fM_s) ** -(2.0 / 3.0))
+        + phi4 * ((2.0*PI * fM_s) ** -(1.0 / 3.0))
         + phi5_log * jnp.log(v)
         + phi5
-        + phi6_log * jnp.log(v) * ((PI * fM_s) ** (1.0 / 3.0))
-        + phi6 * ((PI * fM_s) ** (1.0 / 3.0))
-        + phi7 * ((PI * fM_s) ** (2.0 / 3.0))
-    ) * (3.0 / (128.0 * eta)) - PI / 4.0
+        + phi6_log * jnp.log(v) * ((2.0*PI * fM_s) ** (1.0 / 3.0))
+        + phi6 * ((2.0*PI * fM_s) ** (1.0 / 3.0))
+        + phi7 * ((2.0*PI * fM_s) ** (2.0 / 3.0))
+    ) * (3.0 / (256.0 * eta)) - PI / 4.0
     phi_Ins = (
         phi_TF2
         + (
@@ -209,7 +209,7 @@ def get_IIb_raw_phase_lm_1(fM_s: Array, theta: Array, coeffs: Array, f_RD, f_dam
 
 def get_Amp0_lm_1(fM_s: Array, eta: float) -> Array:
     Amp0 = (
-        (2.0 / 3.0 * eta) ** (1.0 / 2.0) * (fM_s) ** (-7.0 / 6.0) * PI ** (-1.0 / 6.0)
+        (4.0 * eta/ (3.0*PI) ) ** (1.0 / 2.0) * (fM_s) ** (-9.0 / 6.0)
     )
     return Amp0
 
@@ -323,11 +323,11 @@ def get_inspiral_Amp_lm_1(fM_s: Array, theta: Array, coeffs: Array) -> Array:
     Amp_Ins = (
         A0
         # A1 is missed since its zero
-        + A2 * (fM_s ** (2.0 / 3.0))
-        + A3 * fM_s
-        + A4 * (fM_s ** (4.0 / 3.0))
-        + A5 * (fM_s ** (5.0 / 3.0))
-        + A6 * (fM_s**2.0)
+        + A2 * (2.0*fM_s ** (2.0 / 3.0))
+        + A3 * 2.0*fM_s
+        + A4 * (2.0*fM_s ** (4.0 / 3.0))
+        + A5 * (2.0*fM_s ** (5.0 / 3.0))
+        + A6 * (2.0*fM_s**2.0)
         # Now we add the coefficient terms
        # + A7 * (fM_s ** (7.0 / 3.0))
        # + A8 * (fM_s ** (8.0 / 3.0))
@@ -677,7 +677,7 @@ def _gen_IMRPhenomD_lm_1(
     Mf_ref = f_ref * M_s
     Psi_ref = Phase_lm_1(f_ref, theta_intrinsic, coeffs, transition_freqs)
     Psi -= t0 * ((f * M_s) - Mf_ref) + Psi_ref
-    ext_phase_contrib = 2.0 * PI * f * theta_extrinsic[1] - 2*theta_extrinsic[2]
+    ext_phase_contrib = 2.0 * PI * f * theta_extrinsic[1] - theta_extrinsic[2]
     Psi += ext_phase_contrib
     fcut_above = lambda f: (fM_CUT / M_s)
     fcut_below = lambda f: f[jnp.abs(f - (fM_CUT / M_s)).argmin() - 1]
@@ -1286,8 +1286,8 @@ def gen_IMRPhenomD_hphchb_lm_1(f: Array, params: Array, f_ref: float):
 
     hp = h0T * (1 / 2 * (1 + jnp.cos(iota) ** 2))
     hc = -1j * h0T * jnp.cos(iota)
-    hb = jnp.sqrt(3/2)* h0S * (jnp.sin(iota))**2
-
+    hb = - jnp.sqrt(6/5)* h0S * (jnp.sin(iota))
+    
     return hp, hc, hb
 
 #####################################################################################################################
@@ -1362,9 +1362,9 @@ class RippleIMRPhenomD_ScalarTensor(Waveform):
         c=2.998e8
 
         uT=(jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3)
-        uS=(jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
+        uS=(2.0*jnp.pi*(theta[0]/theta[1]**0.6)*frequency*cf/c)**(1/3) # cf =1.4765e3 m
         a,b=-2,-7
-        a1 = 0
+        a1 = -2
         hpT = hp*(1+theta[-3]*uT**a)*jnp.exp(1.0j*theta[-2]*uT**b)
         hcT = hc*(1+theta[-3]*uT**a)*jnp.exp(1.0j*theta[-2]*uT**b)
         hbT = hb*theta[-1]*(uS**a1)*jnp.exp(0.5j*theta[-2]*uS**b)
