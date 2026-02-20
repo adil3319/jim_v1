@@ -1367,7 +1367,7 @@ class RippleIMRPhenomD_ScalarTensor(Waveform):
         a1 = -2
         hpT = hp*(1+theta[-3]*uT**a)*jnp.exp(1.0j*theta[-2]*uT**b)
         hcT = hc*(1+theta[-3]*uT**a)*jnp.exp(1.0j*theta[-2]*uT**b)
-        hbT = hb*theta[-1]*(uS**a1)*jnp.exp(0.5j*theta[-2]*uS**b)
+        hbT = hb*theta[-1]*(uS**a1)*jnp.exp(1.0j*theta[-2]*uS**b)
         
         output["p"] = hpT
         output["c"] = hcT
