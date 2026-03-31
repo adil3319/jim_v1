@@ -511,10 +511,8 @@ class HeterodynedTransientLikelihoodFD(TransientLikelihoodFD):
         params = self.fixing_func(params)
         
         # evaluate the waveform as usual
-        if frequencies<1300:
-            waveform_sky = self.waveform(frequencies, params)
-        else :
-            waveform_sky = 0
+        waveform_sky = self.waveform(frequencies, params)
+        
 
         align_time = jnp.exp(
             -1j * 2 * jnp.pi * frequencies * (self.epoch + params["t_c"])
