@@ -190,6 +190,9 @@ class Jim(object):
             f"Log probability: {production_log_prob.mean():.3f} +/- {production_log_prob.std():.3f}"
         )
         print(
+            f"Maximum , minimum  Log probability  : {production_log_prob.max()} +/- {production_log_prob.min()}"
+        )
+        print(
             f"Local acceptance: {production_local_acceptance.mean():.3f} +/- {production_local_acceptance.std():.3f}"
         )
         print(
