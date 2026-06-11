@@ -192,6 +192,13 @@ class Jim(object):
         print(
             f"Maximum , minimum  Log probability  : {production_log_prob.max()} +/- {production_log_prob.min()}"
         )
+        print("\nParameters at maximum log probability")
+        print("=" * 40)
+        max_idx = production_log_prob.argmax()
+        for key, value in production_chain.items():
+               print(f"{key}: {value[max_idx]}")
+        print(f"\nMaximum log probability: {production_log_prob[max_idx]}")
+        
         print(
             f"Local acceptance: {production_local_acceptance.mean():.3f} +/- {production_local_acceptance.std():.3f}"
         )
